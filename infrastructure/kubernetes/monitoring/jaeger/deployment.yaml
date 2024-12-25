@@ -1,0 +1,132 @@
+# Jaeger Deployment Configuration
+# Version: 1.47
+# Purpose: Distributed tracing backend deployment with security and monitoring capabilities
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jaeger
+  namespace: detection-platform-monitoring
+  labels:
+    app: jaeger
+    component: tracing
+spec:
+  replicas: 1  # Single replica as Jaeger all-in-one is not designed for HA
+  selector:
+    matchLabels:
+      app: jaeger
+  template:
+    metadata:
+      labels:
+        app: jaeger
+        component: tracing
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "16686"
+    spec:
+      # Security Context for the Pod
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
+      
+      # Container Specifications
+      containers:
+      - name: jaeger
+        image: docker.io/jaegertracing/all-in-one:1.47  # Explicit image path with version
+        imagePullPolicy: IfNotPresent
+        
+        # Security Context for the Container
+        securityContext:
+          readOnlyRootFilesystem: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+        
+        # Port Configuration
+        ports:
+        - name: query
+          containerPort: 16686
+          protocol: TCP
+        - name: collector
+          containerPort: 14268
+          protocol: TCP
+        - name: agent
+          containerPort: 6831
+          protocol: UDP
+        - name: zipkin
+          containerPort: 9411
+          protocol: TCP
+        
+        # Resource Limits and Requests
+        resources:
+          limits:
+            cpu: "1000m"
+            memory: "2Gi"
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+        
+        # Volume Mounts
+        volumeMounts:
+        - name: jaeger-config
+          mountPath: /etc/jaeger
+          readOnly: true
+        - name: tmp
+          mountPath: /tmp
+        
+        # Environment Variables
+        env:
+        - name: SPAN_STORAGE_TYPE
+          value: "memory"  # In-memory storage for all-in-one deployment
+        - name: COLLECTOR_ZIPKIN_HOST_PORT
+          value: ":9411"  # Enable Zipkin collector
+        - name: QUERY_BASE_PATH
+          value: "/jaeger"  # Base path for UI
+        
+        # Health Checks
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 16686
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 16686
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+      
+      # Volumes
+      volumes:
+      - name: jaeger-config
+        configMap:
+          name: jaeger-config
+      - name: tmp
+        emptyDir: {}
+      
+      # Pod Specifications
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      serviceAccountName: jaeger  # Assumes service account exists
+      
+      # Node Selection and Affinity
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - jaeger
+              topologyKey: kubernetes.io/hostname
