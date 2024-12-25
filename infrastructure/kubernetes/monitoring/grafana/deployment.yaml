@@ -1,0 +1,124 @@
+# Grafana Deployment manifest for AI-Driven Detection Engineering platform
+# Version: grafana/grafana:9.5.3
+# Purpose: Provides visualization and analytics for observability data, metrics, and security monitoring
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: detection-platform-monitoring
+  labels:
+    app: grafana
+    component: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+      component: monitoring
+  template:
+    metadata:
+      labels:
+        app: grafana
+        component: monitoring
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+    spec:
+      # Security context for running as non-root user
+      securityContext:
+        fsGroup: 472  # Grafana group ID
+        runAsUser: 472  # Grafana user ID
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      
+      containers:
+      - name: grafana
+        image: grafana/grafana:9.5.3
+        ports:
+        - name: http
+          containerPort: 3000
+          protocol: TCP
+        
+        # Environment configuration
+        env:
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: grafana-secrets
+              key: admin-password
+        - name: GF_AUTH_BASIC_ENABLED
+          value: "true"
+        - name: GF_AUTH_ANONYMOUS_ENABLED
+          value: "false"
+        
+        # Resource limits and requests
+        resources:
+          requests:
+            cpu: 200m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        
+        # Volume mounts for configuration and persistence
+        volumeMounts:
+        - name: config
+          mountPath: /etc/grafana
+        - name: storage
+          mountPath: /var/lib/grafana
+        - name: dashboards
+          mountPath: /var/lib/grafana/dashboards
+        
+        # Health checks
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+          periodSeconds: 10
+          failureThreshold: 3
+        
+        startupProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 30
+      
+      # Volume definitions
+      volumes:
+      - name: config
+        configMap:
+          name: grafana-config
+      - name: storage
+        persistentVolumeClaim:
+          claimName: grafana-storage
+      - name: dashboards
+        configMap:
+          name: grafana-dashboards
+      
+      # Pod anti-affinity for high availability
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - grafana
+              topologyKey: kubernetes.io/hostname
