@@ -1,0 +1,30 @@
+# Service manifest for Grafana monitoring dashboard
+# Version: v1
+# Provides internal cluster access to visualization and analytics capabilities
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: grafana
+  namespace: detection-platform-monitoring
+  labels:
+    app: grafana
+    component: monitoring
+    part-of: detection-platform
+    managed-by: kubernetes
+  annotations:
+    description: "Exposes Grafana monitoring dashboard"
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3000"
+
+spec:
+  type: ClusterIP  # Internal cluster access only for security
+  ports:
+    - port: 3000  # Standard Grafana port
+      targetPort: 3000
+      protocol: TCP
+      name: http
+  selector:
+    app: grafana
+    component: monitoring
+  sessionAffinity: None  # No need for session stickiness for monitoring dashboard
