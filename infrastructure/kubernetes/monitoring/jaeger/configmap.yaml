@@ -1,0 +1,103 @@
+# ConfigMap for Jaeger distributed tracing configuration
+# Version: Jaeger 1.35+
+# Purpose: Provides comprehensive configuration for Jaeger tracing system
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jaeger-config
+  namespace: detection-platform-monitoring
+  labels:
+    app: jaeger
+    component: tracing
+    part-of: detection-platform
+    managed-by: kubernetes
+data:
+  # Collector configuration for receiving and processing spans
+  collector.yaml: |
+    collector:
+      zipkin:
+        # Zipkin compatible endpoint for legacy integrations
+        host_port: ":9411"
+      # Optimize worker pool for high throughput
+      num_workers: 50
+      queue_size: 2000
+      grpc:
+        # gRPC endpoint for receiving spans
+        host_port: ":14250"
+      http:
+        # HTTP endpoint for receiving spans
+        host_port: ":14268"
+
+  # Sampling configuration with service-specific strategies
+  sampling.yaml: |
+    sampling:
+      # Default sampling strategy for services without specific configuration
+      default_strategy:
+        type: probabilistic
+        param: 1.0
+      # Service-specific sampling strategies
+      service_strategies:
+        # API service sampling configuration
+        - service: detection-platform-api
+          type: probabilistic
+          param: 1.0
+          operation_strategies:
+            - operation: /api/v1/detections
+              type: probabilistic
+              param: 1.0
+        # Worker service sampling configuration
+        - service: detection-platform-worker
+          type: probabilistic
+          param: 1.0
+        # Intelligence service sampling configuration
+        - service: detection-platform-intelligence
+          type: probabilistic
+          param: 1.0
+
+  # Agent configuration for collecting spans from services
+  agent.yaml: |
+    agent:
+      reporter:
+        grpc:
+          # gRPC endpoint for sending spans to collector
+          host_port: ":14250"
+        # Optimize queue and batch settings for performance
+        queue_size: 1000
+        batch_size: 100
+        batch_interval: "1s"
+      sampling:
+        # Reference to sampling strategies configuration
+        strategies_file: "/etc/jaeger/sampling.yaml"
+
+  # Query service configuration for UI and API access
+  query.yaml: |
+    query:
+      base_path: /jaeger
+      static_files: /usr/local/jaeger-ui
+      port: 16686
+      log_level: info
+      # Configure headers for trace correlation
+      additional_headers:
+        - x-request-id
+        - x-b3-traceid
+        - x-b3-spanid
+      # CORS configuration for UI access
+      cors:
+        enabled: true
+        allowed_origins:
+          - "*"
+        allowed_headers:
+          - "*"
+
+  # Storage configuration for trace data
+  storage.yaml: |
+    storage:
+      # Using in-memory storage for development/testing
+      # For production, consider using Elasticsearch or Cassandra
+      type: memory
+      options:
+        max_traces: 100000
+      # Configure retention policy for trace data
+      retention:
+        schedule: "0 0 * * *"  # Daily cleanup at midnight
+        days: 7  # Retain traces for 7 days
