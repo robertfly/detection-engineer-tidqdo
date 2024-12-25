@@ -1,0 +1,56 @@
+node_modules/*
+
+# Build outputs
+dist/*
+build/*
+.next/*
+out/*
+.turbo/*
+.swc/*
+
+# Test files and coverage
+coverage/*
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__snapshots__/*
+e2e/*
+cypress/*
+
+# Configuration files
+*.config.js
+*.config.ts
+vite.config.ts
+jest.config.ts
+
+# Type definitions
+*.d.ts
+
+# Static assets
+src/assets/*
+public/*
+storybook-static/*
+
+# Story files
+*.stories.tsx
+
+# Mock files
+*.mock.ts
+
+# Generated files
+generated/*
+
+# IDE settings
+.vscode/*
+
+# Git hooks
+.husky/*
+
+# Minified/bundled files
+*.min.js
+*.bundle.js
+
+# Temporary files
+.DS_Store
+*.log
