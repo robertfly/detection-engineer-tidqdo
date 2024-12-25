@@ -1,0 +1,103 @@
+# Prometheus Deployment for AI-Driven Detection Engineering Platform
+# Version: v2.45.0
+# Purpose: Metrics collection, storage and alerting with enhanced security and resource management
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: detection-platform-monitoring
+  labels:
+    app: detection-platform
+    component: prometheus
+spec:
+  replicas: 1  # Single replica as Prometheus uses persistent storage
+  selector:
+    matchLabels:
+      app: detection-platform
+      component: prometheus
+  template:
+    metadata:
+      labels:
+        app: detection-platform
+        component: prometheus
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+    spec:
+      serviceAccountName: prometheus  # Uses dedicated service account for RBAC
+      securityContext:
+        fsGroup: 65534  # prometheus user
+        runAsUser: 65534  # prometheus user
+        runAsNonRoot: true  # Security best practice
+      containers:
+        - name: prometheus
+          image: prom/prometheus:v2.45.0
+          imagePullPolicy: IfNotPresent
+          args:
+            - --config.file=/etc/prometheus/prometheus.yml
+            - --storage.tsdb.path=/prometheus
+            - --storage.tsdb.retention.time=15d  # 15-day retention as per requirements
+            - --web.console.libraries=/usr/share/prometheus/console_libraries
+            - --web.console.templates=/usr/share/prometheus/consoles
+            - --web.enable-lifecycle  # Enables runtime config reloading
+            - --storage.tsdb.no-lockfile  # Better for Kubernetes deployments
+          ports:
+            - name: http
+              containerPort: 9090
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /etc/prometheus
+            - name: storage
+              mountPath: /prometheus
+          resources:
+            requests:
+              cpu: 500m  # Base CPU request
+              memory: 2Gi  # Base memory request
+            limits:
+              cpu: 1000m  # CPU limit
+              memory: 4Gi  # Memory limit
+          livenessProbe:
+            httpGet:
+              path: /-/healthy
+              port: http
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /-/ready
+              port: http
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+      volumes:
+        - name: config
+          configMap:
+            name: prometheus-config
+        - name: storage
+          persistentVolumeClaim:
+            claimName: prometheus-data
+      nodeSelector:
+        kubernetes.io/os: linux
+      terminationGracePeriodSeconds: 300  # 5 minutes for clean shutdown
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: component
+                      operator: In
+                      values:
+                        - prometheus
+                topologyKey: kubernetes.io/hostname
