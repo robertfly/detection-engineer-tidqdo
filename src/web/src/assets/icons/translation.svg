@@ -1,0 +1,30 @@
+<svg 
+  xmlns="http://www.w3.org/2000/svg" 
+  width="24" 
+  height="24" 
+  viewBox="0 0 24 24" 
+  fill="none" 
+  stroke="currentColor" 
+  stroke-width="2" 
+  stroke-linecap="round" 
+  stroke-linejoin="round"
+  role="img"
+  aria-label="Translation"
+>
+  <!-- First text block representing source language -->
+  <path d="M4 5h7" />
+  <path d="M9 3v2" />
+  <path d="M4 9h1" />
+  <path d="M4 13h3" />
+  <path d="M7 8c0 4-5 4-5 4" />
+  <path d="M6 8c0 4 5 4 5 4" />
+  
+  <!-- Arrow indicating translation direction -->
+  <path d="M14 9l2-2 2 2" />
+  <path d="M16 7v8" />
+  
+  <!-- Second text block representing target language -->
+  <path d="M13 17l3 3 3-3" />
+  <path d="M15 12h5" />
+  <path d="M17.5 9.5L19 12l1.5-2.5" />
+</svg>
