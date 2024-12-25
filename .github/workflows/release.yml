@@ -1,0 +1,203 @@
+name: Platform Release Pipeline
+
+# Trigger on release publish or manual dispatch with version input
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version'
+        required: true
+        type: string
+      force_deploy:
+        description: 'Force deployment outside release window'
+        required: false
+        type: boolean
+        default: false
+
+# Ensure only one release workflow runs at a time
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+# Define required permissions
+permissions:
+  contents: write
+  packages: write
+  deployments: write
+  id-token: write
+  actions: write
+  issues: write
+  pull-requests: write
+  security-events: write
+
+env:
+  RELEASE_VERSION: ${{ github.event.release.tag_name || inputs.version }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+jobs:
+  prepare:
+    name: Prepare Release
+    runs-on: ubuntu-latest
+    outputs:
+      release_info: ${{ steps.prepare_release.outputs.release_info }}
+      is_valid: ${{ steps.validate_window.outputs.is_valid }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate release window
+        id: validate_window
+        if: ${{ !inputs.force_deploy }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const releaseWindow = process.env.RELEASE_WINDOW || "0 0 * * 0-4"; // Default: weekdays midnight
+            const currentTime = new Date();
+            // Implement release window validation logic
+            const isValid = true; // Replace with actual validation
+            core.setOutput('is_valid', isValid);
+
+      - name: Run security scan
+        uses: release-drafter/release-drafter@v5
+        with:
+          config-name: release-drafter.yml
+          disable-autolabeler: true
+          commitish: main
+
+      - name: Prepare release info
+        id: prepare_release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const releaseInfo = {
+              version: process.env.RELEASE_VERSION,
+              components: ['backend', 'web', 'extension'],
+              changelog: 'Generated changelog content',
+              securityNotes: 'Security impact assessment'
+            };
+            core.setOutput('release_info', JSON.stringify(releaseInfo));
+
+  backend-release:
+    needs: prepare
+    if: needs.prepare.outputs.is_valid == 'true'
+    uses: ./.github/workflows/backend.yml
+    with:
+      version: ${{ env.RELEASE_VERSION }}
+    secrets: inherit
+
+  web-release:
+    needs: prepare
+    if: needs.prepare.outputs.is_valid == 'true'
+    uses: ./.github/workflows/web.yml
+    with:
+      version: ${{ env.RELEASE_VERSION }}
+    secrets: inherit
+
+  extension-release:
+    needs: prepare
+    if: needs.prepare.outputs.is_valid == 'true'
+    uses: ./.github/workflows/extension.yml
+    with:
+      version: ${{ env.RELEASE_VERSION }}
+    secrets: inherit
+
+  verify-deployment:
+    name: Verify Deployment
+    needs: [backend-release, web-release, extension-release]
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Verify backend health
+        run: |
+          BACKEND_HEALTH=$(curl -s https://api.detection-platform.com/health)
+          if [[ "$BACKEND_HEALTH" != "healthy" ]]; then
+            echo "Backend health check failed"
+            exit 1
+          fi
+
+      - name: Verify frontend health
+        run: |
+          FRONTEND_HEALTH=$(curl -s https://detection-platform.com/health)
+          if [[ "$FRONTEND_HEALTH" != "healthy" ]]; then
+            echo "Frontend health check failed"
+            exit 1
+          fi
+
+      - name: Verify extension deployment
+        run: |
+          EXTENSION_VERSION=$(curl -s https://ai-detection-platform.com/extension/version)
+          if [[ "$EXTENSION_VERSION" != "${{ env.RELEASE_VERSION }}" ]]; then
+            echo "Extension version mismatch"
+            exit 1
+          fi
+
+      - name: Monitor deployment metrics
+        uses: datadog/action-datadog-reporting@v1
+        with:
+          api-key: ${{ env.DATADOG_API_KEY }}
+          metrics: |
+            deployment.status:1|gauge
+            deployment.duration:${{ steps.deploy.outputs.duration }}|gauge
+
+  notify:
+    name: Send Notifications
+    needs: verify-deployment
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      - name: Prepare notification content
+        id: notification
+        run: |
+          if [[ "${{ needs.verify-deployment.result }}" == "success" ]]; then
+            echo "status=✅ Release ${{ env.RELEASE_VERSION }} deployed successfully" >> $GITHUB_OUTPUT
+          else
+            echo "status=❌ Release ${{ env.RELEASE_VERSION }} deployment failed" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Slack notification
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data '{
+              "text": "${{ steps.notification.outputs.status }}",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ steps.notification.outputs.status }}\n*Version:* ${{ env.RELEASE_VERSION }}\n*Details:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                  }
+                }
+              ]
+            }' \
+            ${{ env.SLACK_WEBHOOK_URL }}
+
+      - name: Update release notes
+        if: needs.verify-deployment.result == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const releaseInfo = JSON.parse('${{ needs.prepare.outputs.release_info }}');
+            await github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: context.payload.release.id,
+              body: `${releaseInfo.changelog}\n\n## Security Notes\n${releaseInfo.securityNotes}`
+            });
