@@ -1,0 +1,89 @@
+---
+# PersistentVolumeClaim for Loki storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: loki-storage
+  namespace: detection-platform-monitoring
+  labels:
+    app: loki
+spec:
+  storageClassName: gp3-encrypted
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+---
+# Deployment for Loki log aggregation system
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki
+  namespace: detection-platform-monitoring
+  labels:
+    app: loki
+spec:
+  replicas: 2  # High availability with multiple replicas
+  selector:
+    matchLabels:
+      app: loki
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1  # Ensure availability during updates
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: loki
+      annotations:
+        prometheus.io/scrape: "true"  # Enable Prometheus metrics scraping
+        prometheus.io/port: "3100"
+    spec:
+      # Security context for non-root execution
+      securityContext:
+        fsGroup: 10001
+        runAsGroup: 10001
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: loki
+          # grafana/loki:2.9.0 - Log aggregation system container
+          image: docker.io/grafana/loki:2.9.0
+          ports:
+            - name: http
+              containerPort: 3100
+            - name: grpc
+              containerPort: 9096
+          volumeMounts:
+            - name: config
+              mountPath: /etc/loki
+            - name: data
+              mountPath: /data
+          # Resource limits and requests for production workload
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          # Health checks for container lifecycle management
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 45
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 45
+      volumes:
+        - name: config
+          configMap:
+            name: loki-config
+        - name: data
+          persistentVolumeClaim:
+            claimName: loki-storage
