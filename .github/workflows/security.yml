@@ -1,0 +1,153 @@
+name: Security Scan
+
+# Trigger on push/PR to main and daily at midnight UTC
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * *'  # Daily at 00:00 UTC
+
+# Environment configuration
+env:
+  SCAN_SEVERITY: CRITICAL,HIGH
+  FAIL_ON_SEVERITY: CRITICAL
+  PYTHON_VERSION: "3.11"
+  NODE_VERSION: "18"
+
+permissions:
+  security-events: write
+  actions: read
+  contents: read
+  packages: read
+
+jobs:
+  security-scan:
+    name: Comprehensive Security Scan
+    runs-on: ubuntu-latest
+    environment:
+      name: security
+      url: ${{ github.server_url }}/${{ github.repository }}/security/code-scanning
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for accurate scanning
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      # Python Backend Security Scanning
+      - name: Python Dependency Scan
+        uses: snyk/actions/python@v1.4.0
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+          args: --severity-threshold=${{ env.SCAN_SEVERITY }} --file=src/backend/pyproject.toml
+
+      # Node.js Frontend Security Scanning
+      - name: Node.js Dependency Scan
+        uses: snyk/actions/node@v1.4.0
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: test
+          args: --severity-threshold=${{ env.SCAN_SEVERITY }} --file=src/web/package.json
+
+      # Container Security Scanning
+      - name: Backend Container Scan
+        uses: aquasecurity/trivy-action@0.14.0
+        with:
+          scan-type: 'fs'
+          scan-ref: 'src/backend'
+          format: 'sarif'
+          output: 'trivy-backend-results.sarif'
+          severity: ${{ env.SCAN_SEVERITY }}
+          exit-code: '1'
+          ignore-unfixed: true
+
+      - name: Frontend Container Scan
+        uses: aquasecurity/trivy-action@0.14.0
+        with:
+          scan-type: 'fs'
+          scan-ref: 'src/web'
+          format: 'sarif'
+          output: 'trivy-frontend-results.sarif'
+          severity: ${{ env.SCAN_SEVERITY }}
+          exit-code: '1'
+          ignore-unfixed: true
+
+      # Static Code Analysis
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: python, javascript
+          queries: security-extended,security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:python /language:javascript"
+
+      # Software Bill of Materials (SBOM) Generation
+      - name: Generate SBOM
+        uses: anchore/syft-action@v0.6.0
+        with:
+          path: "."
+          output: cyclonedx-json
+          file: sbom.json
+
+      # Upload Security Results
+      - name: Upload Backend Scan Results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: trivy-backend-results.sarif
+          category: backend-security
+
+      - name: Upload Frontend Scan Results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: trivy-frontend-results.sarif
+          category: frontend-security
+
+      # Archive Security Reports
+      - name: Archive Security Reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: security-reports
+          path: |
+            trivy-backend-results.sarif
+            trivy-frontend-results.sarif
+            sbom.json
+          retention-days: 90
+
+      # Notify on Critical Findings
+      - name: Check for Critical Vulnerabilities
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issue = {
+              title: '🚨 Critical Security Vulnerabilities Detected',
+              body: 'Security scan detected critical vulnerabilities. Please review the scan results in the Security tab.',
+              labels: ['security', 'critical']
+            }
+            github.rest.issues.create({
+              ...context.repo,
+              ...issue
+            })
