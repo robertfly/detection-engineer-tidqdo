@@ -1,0 +1,245 @@
+/**
+ * Global CSS styles for AI Detection Platform
+ * Version: 1.0.0
+ * Implements Material Design 3.0 principles with responsive design
+ * and accessibility support
+ */
+
+@import './variables.css';
+@import './themes.css';
+
+/* Reset & Base Styles
+-------------------------------------------------- */
+html {
+  box-sizing: border-box;
+  font-size: 16px;
+  font-family: var(--font-family-base);
+  line-height: var(--line-height-normal);
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  contain: content;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+  contain: layout style paint;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  min-height: 100vh;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+  will-change: background-color;
+  transition: background-color 0.3s ease-in-out;
+}
+
+/* Typography & Text Styles
+-------------------------------------------------- */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--text-primary);
+}
+
+p {
+  margin-bottom: var(--spacing-4);
+  line-height: var(--line-height-relaxed);
+}
+
+/* Links & Interactive Elements
+-------------------------------------------------- */
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color var(--transition-normal);
+}
+
+a:hover {
+  color: var(--primary-light);
+  text-decoration: underline;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* Accessibility Enhancements
+-------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--focus-ring-color);
+  border-radius: 2px;
+}
+
+/* High Contrast Mode Support */
+@media (forced-colors: active) {
+  :root {
+    --primary-color: CanvasText;
+    --text-primary: CanvasText;
+    --background-color: Canvas;
+  }
+}
+
+/* Reduced Motion Support
+-------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  body {
+    transition: none !important;
+  }
+}
+
+/* Responsive Design
+-------------------------------------------------- */
+/* Mobile: 0-599px */
+@media (max-width: 599px) {
+  html {
+    font-size: 14px;
+  }
+
+  body {
+    padding: var(--spacing-4);
+  }
+
+  :root {
+    --container-width: 100%;
+  }
+}
+
+/* Tablet: 600-1239px */
+@media (min-width: 600px) and (max-width: 1239px) {
+  html {
+    font-size: 15px;
+  }
+
+  body {
+    padding: var(--spacing-6);
+  }
+
+  :root {
+    --container-width: 90%;
+  }
+}
+
+/* Desktop: 1240px+ */
+@media (min-width: 1240px) {
+  html {
+    font-size: 16px;
+  }
+
+  body {
+    padding: var(--spacing-8);
+  }
+
+  :root {
+    --container-width: 1200px;
+  }
+}
+
+/* Layout Utilities
+-------------------------------------------------- */
+.container {
+  width: var(--container-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-4);
+  padding-right: var(--spacing-4);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Print Styles
+-------------------------------------------------- */
+@media print {
+  html {
+    font-size: 12pt;
+  }
+
+  body {
+    background-color: #fff !important;
+    color: #000 !important;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+
+  a[href]::after {
+    content: " (" attr(href) ")";
+  }
+
+  a[href^="#"]::after,
+  a[href^="javascript:"]::after {
+    content: "";
+  }
+
+  pre, blockquote {
+    border: 1px solid #999;
+    page-break-inside: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr, img {
+    page-break-inside: avoid;
+  }
+
+  p, h2, h3 {
+    orphans: 3;
+    widows: 3;
+  }
+
+  h2, h3 {
+    page-break-after: avoid;
+  }
+}
+
+/* Performance Optimizations
+-------------------------------------------------- */
+img, video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* GPU Acceleration for Smooth Animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Tailwind CSS Integration
+-------------------------------------------------- */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
