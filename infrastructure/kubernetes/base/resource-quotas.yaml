@@ -1,0 +1,66 @@
+# Resource Quotas for AI-Driven Detection Engineering Platform
+# Version: 1.0
+# Purpose: Define and enforce compute resource limits for different namespaces
+# ensuring fair resource allocation and environment isolation
+
+---
+# Production Environment Resource Quota
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: production-compute-resources
+  namespace: detection-platform-prod
+  labels:
+    environment: production
+    component: resource-quota
+  annotations:
+    quota.enforcement: "Immediate"
+    monitoring.alerts: "QuotaNearExhaustion,QuotaExceeded"
+    review.period: "Monthly"
+spec:
+  hard:
+    # Compute Resource Limits
+    requests.cpu: "32"
+    requests.memory: "64Gi"
+    limits.cpu: "64"
+    limits.memory: "128Gi"
+    
+    # Object Count Limits
+    pods: "50"
+    services: "20"
+    persistentvolumeclaims: "20"
+    secrets: "30"
+    configmaps: "30"
+  scopes:
+    - NotTerminating
+
+---
+# Staging Environment Resource Quota
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: staging-compute-resources
+  namespace: detection-platform-staging
+  labels:
+    environment: staging
+    component: resource-quota
+  annotations:
+    quota.enforcement: "Immediate"
+    monitoring.alerts: "QuotaNearExhaustion,QuotaExceeded"
+    review.period: "Monthly"
+spec:
+  hard:
+    # Compute Resource Limits
+    requests.cpu: "16"
+    requests.memory: "32Gi"
+    limits.cpu: "32"
+    limits.memory: "64Gi"
+    
+    # Object Count Limits
+    pods: "30"
+    services: "15"
+    persistentvolumeclaims: "15"
+    secrets: "20"
+    configmaps: "20"
+  scopes:
+    - NotTerminating
