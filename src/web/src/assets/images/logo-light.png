@@ -1,0 +1,35 @@
+Dimensions:
+- Width: 240px
+- Height: 48px
+- Aspect ratio: 5:1
+
+Image Properties:
+- Format: PNG with transparency
+- Color profile: sRGB
+- Resolution: 288 DPI (recommended)
+- Max file size: 25KB
+- Compression: Lossless PNG optimization
+
+Design Requirements:
+- Theme: Light version optimized for light backgrounds
+- Contrast ratio: Minimum 4.5:1 against light backgrounds
+- Color-blindness safe design
+- Vector-based scaling for crisp display
+
+Technical Requirements:
+- Transparency enabled for flexible background placement
+- CDN-cacheable optimized format
+- Preload-ready for performance
+- High DPI display optimized
+
+Usage Contexts:
+1. Application header component
+2. Navigation branding
+3. Light theme displays
+
+Accessibility Requirements:
+- Alt text: "AI Detection Platform Logo"
+- Sufficient contrast for visibility
+- Color-blind friendly design
+
+The image should be created by a professional designer using vector design tools and exported according to these specifications. The source vector file should be maintained in the design system repository for future updates.
