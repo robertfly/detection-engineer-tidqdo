@@ -1,0 +1,59 @@
+# Kubernetes Ingress manifest for AI-Driven Detection Engineering platform
+# Version: v1
+# Purpose: Configure external access, TLS termination, and traffic routing with enhanced security
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: detection-platform-ingress
+  annotations:
+    # Ingress controller configuration
+    kubernetes.io/ingress.class: "nginx"
+    
+    # SSL/TLS security configurations
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-protocols: "TLSv1.3"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    
+    # Request handling and timeout configurations
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    
+    # Buffer optimizations for performance
+    nginx.ingress.kubernetes.io/proxy-buffers-number: "4"
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "8k"
+    
+    # Observability
+    nginx.ingress.kubernetes.io/enable-access-log: "true"
+
+spec:
+  # TLS configuration with automatic certificate management
+  tls:
+  - hosts:
+    - detection-platform.example.com
+    secretName: detection-platform-tls
+
+  # Traffic routing rules
+  rules:
+  - host: detection-platform.example.com
+    http:
+      paths:
+      # API traffic routing
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: backend
+            port:
+              number: 80
+      
+      # Web UI traffic routing
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-service
+            port:
+              number: 80
