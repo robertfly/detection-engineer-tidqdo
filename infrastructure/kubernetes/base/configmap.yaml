@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  labels:
+    app: detection-platform
+    component: backend
+    # Labels for easier resource management
+    tier: configuration
+    environment: production
+data:
+  # Application Core Configuration
+  PROJECT_NAME: "AI-Driven Detection Engineering Platform"
+  ENVIRONMENT: "production"
+  API_V1_PREFIX: "/api/v1"
+  LOG_LEVEL: "INFO"
+  
+  # CORS Configuration
+  # Strictly controlled origins for security
+  BACKEND_CORS_ORIGINS: "http://localhost:3000,https://app.detection-platform.com"
+  
+  # Authentication Configuration
+  # JWT settings (non-sensitive)
+  ALGORITHM: "HS256"
+  ACCESS_TOKEN_EXPIRE_MINUTES: "1440"  # 24 hours
+  REFRESH_TOKEN_EXPIRE_DAYS: "7"
+  
+  # Database Configuration
+  # Using internal cluster DNS for enhanced security
+  POSTGRES_SERVER: "detection-platform-db.cluster.local"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "detection_platform"
+  POSTGRES_USER: "detection_platform"
+  
+  # Redis Cache Configuration
+  REDIS_HOST: "detection-platform-cache.cluster.local"
+  REDIS_PORT: "6379"
+  
+  # MongoDB Configuration
+  MONGODB_URL: "mongodb://detection-platform-docs.cluster.local:27017/detection_platform"
+  
+  # Elasticsearch Configuration
+  ELASTICSEARCH_HOST: "detection-platform-search.cluster.local"
+  ELASTICSEARCH_PORT: "9200"
+
+  # Note: Sensitive configuration values such as:
+  # - SECRET_KEY
+  # - POSTGRES_PASSWORD
+  # - REDIS_PASSWORD
+  # - MONGODB_PASSWORD
+  # Should be stored in Kubernetes Secrets, not in this ConfigMap
