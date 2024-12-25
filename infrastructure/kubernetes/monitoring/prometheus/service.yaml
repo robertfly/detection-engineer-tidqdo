@@ -1,0 +1,27 @@
+# Service configuration for Prometheus monitoring server
+# Version: v1
+# Purpose: Exposes Prometheus endpoints for internal metrics collection and querying
+# Dependencies: Requires prometheus deployment in detection-platform-monitoring namespace
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: detection-platform-monitoring
+  labels:
+    app: detection-platform
+    component: prometheus
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9090"
+spec:
+  type: ClusterIP  # Internal cluster access only for security
+  selector:
+    app: detection-platform
+    component: prometheus
+  ports:
+    - name: http
+      port: 9090  # Standard Prometheus port
+      targetPort: 9090
+      protocol: TCP
+  sessionAffinity: None  # No need for session stickiness for Prometheus
