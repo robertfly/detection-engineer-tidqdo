@@ -1,0 +1,37 @@
+Format: PNG with transparency
+Theme: Dark mode optimized
+Dimensions: Responsive with preservation of aspect ratio
+Color Profile: sRGB
+Transparency: Required (Alpha channel)
+Background: Transparent
+Optimization: Lossless compression
+
+Key Technical Requirements:
+1. File Format: PNG with alpha channel support
+2. Maximum File Size: 50KB
+3. Color Scheme: Optimized for dark backgrounds (#1E1E1E)
+4. Contrast Ratio: Minimum 4.5:1 against dark backgrounds
+5. Resolution: Vector-based source with PNG export
+6. Transparency: Full alpha channel support
+7. CDN Configuration: 
+   - Cache-Control: public, max-age=31536000, immutable
+   - ETag: Enabled
+   - Edge Caching: Enabled
+
+Accessibility Requirements:
+- Alt Text: "AI Detection Platform Logo"
+- ARIA: aria-hidden="true"
+- Role: presentation
+- WCAG 2.1 AA Compliant
+
+Loading Strategy:
+- Preload hint
+- High priority resource
+- WebP format fallback available
+
+Responsive Behavior:
+- Mobile (0-599px): Scale proportionally
+- Tablet (600-1239px): Scale proportionally
+- Desktop (1240px+): Original dimensions
+
+The image should be created by a professional designer using vector graphics software and exported following these specifications for optimal quality and performance.
