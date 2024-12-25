@@ -1,0 +1,163 @@
+# Prometheus ConfigMap for AI-Driven Detection Engineering Platform
+# Version: v2.45.0
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: detection-platform-monitoring
+  labels:
+    app: prometheus
+    component: server
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s     # Default scrape interval
+      evaluation_interval: 15s  # Default evaluation interval for rules
+      scrape_timeout: 10s      # Default scrape timeout
+
+    # Rule files to load
+    rule_files:
+      - /etc/prometheus/recording_rules.yml
+      - /etc/prometheus/alert_rules.yml
+
+    scrape_configs:
+      # Kubernetes API Server monitoring
+      - job_name: 'kubernetes-apiservers'
+        kubernetes_sd_configs:
+          - role: endpoints
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: default;kubernetes;https
+
+      # Kubernetes Node monitoring
+      - job_name: 'kubernetes-nodes'
+        kubernetes_sd_configs:
+          - role: node
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+
+      # Pod monitoring
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+
+      # Detection Platform API monitoring
+      - job_name: 'detection-platform-api'
+        metrics_path: /metrics
+        scrape_interval: 10s
+        static_configs:
+          - targets: ['backend-service:8000']
+        metric_relabel_configs:
+          - source_labels: [__name__]
+            regex: 'http_request_duration_.*'
+            action: keep
+
+      # Detection Platform Web monitoring
+      - job_name: 'detection-platform-web'
+        metrics_path: /metrics
+        scrape_interval: 10s
+        static_configs:
+          - targets: ['web-service:3000']
+
+  recording_rules.yml: |
+    groups:
+      - name: detection_platform_recording_rules
+        rules:
+          # API Performance metrics
+          - record: api_request_duration_seconds
+            expr: rate(http_request_duration_seconds_sum[5m])
+            labels:
+              component: api
+
+          # Cache performance metrics
+          - record: cache_hit_ratio
+            expr: rate(cache_hits_total[5m]) / rate(cache_requests_total[5m])
+            labels:
+              component: cache
+
+          # System uptime metrics
+          - record: system_uptime_ratio
+            expr: avg_over_time(up[24h])
+            labels:
+              component: system
+
+          # Error rate metrics
+          - record: api_error_rate
+            expr: sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m]))
+            labels:
+              component: api
+
+  alert_rules.yml: |
+    groups:
+      - name: detection_platform_alerts
+        rules:
+          # API Latency Alerts
+          - alert: HighAPILatency
+            expr: api_request_duration_seconds > 0.5
+            for: 5m
+            labels:
+              severity: warning
+              team: platform
+            annotations:
+              summary: High API latency detected
+              description: API endpoint latency is above 500ms threshold
+              runbook_url: https://wiki.example.com/runbooks/high-api-latency
+
+          # Cache Performance Alerts
+          - alert: LowCacheHitRate
+            expr: cache_hit_ratio < 0.8
+            for: 15m
+            labels:
+              severity: warning
+              team: platform
+            annotations:
+              summary: Low cache hit rate detected
+              description: Cache hit rate is below 80% target
+              runbook_url: https://wiki.example.com/runbooks/low-cache-hits
+
+          # System Uptime Alerts
+          - alert: SystemUptimeAlert
+            expr: system_uptime_ratio < 0.999
+            for: 1h
+            labels:
+              severity: critical
+              team: platform
+            annotations:
+              summary: System uptime below SLA
+              description: System uptime is below 99.9% SLA target
+              runbook_url: https://wiki.example.com/runbooks/uptime-sla
+
+          # High Error Rate Alert
+          - alert: HighErrorRate
+            expr: api_error_rate > 0.05
+            for: 5m
+            labels:
+              severity: critical
+              team: platform
+            annotations:
+              summary: High API error rate detected
+              description: API error rate is above 5% threshold
+              runbook_url: https://wiki.example.com/runbooks/high-error-rate
