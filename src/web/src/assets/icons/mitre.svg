@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" 
+  xmlns="http://www.w3.org/2000/svg"
+  role="img"
+  aria-label="MITRE ATT&CK Framework"
+  style="enable-background:new 0 0 24 24"
+  shape-rendering="geometricPrecision">
+  
+  <!-- Optimized paths for MITRE ATT&CK shield/matrix representation -->
+  <g fill="currentColor">
+    <!-- Shield base - uses currentColor for theme inheritance -->
+    <path d="M12 2L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-3zm0 2.08l6 2v5c0 4.05-2.8 7.8-6 8.85-3.2-1.05-6-4.8-6-8.85v-5l6-2z"
+      opacity="0.9"
+      stroke="none"
+      vector-effect="non-scaling-stroke"/>
+    
+    <!-- Matrix grid representation -->
+    <path d="M9 8h6v2H9zm0 3h6v2H9zm0 3h6v2H9z"
+      opacity="0.7"
+      stroke="none"
+      vector-effect="non-scaling-stroke"/>
+  </g>
+
+  <!-- Focus/active state indicator - hidden by default -->
+  <circle cx="12" cy="12" r="11"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    opacity="0"
+    class="focus-indicator">
+    <animate attributeName="opacity"
+      values="0;0.2;0"
+      dur="2s"
+      begin="focus"
+      repeatCount="1"/>
+  </circle>
+
+  <!-- Ensure SVG is accessible and scalable -->
+  <title>MITRE ATT&CK Framework</title>
+  <desc>Icon representing the MITRE ATT&CK framework with shield and matrix elements</desc>
+</svg>
