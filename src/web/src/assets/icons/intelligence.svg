@@ -1,0 +1,19 @@
+<svg 
+  xmlns="http://www.w3.org/2000/svg" 
+  viewBox="0 0 24 24" 
+  width="24" 
+  height="24" 
+  fill="currentColor" 
+  role="img" 
+  aria-label="Intelligence"
+  display="inline-block"
+>
+  <!-- Brain/circuit representation for intelligence -->
+  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 1.5c4.14 0 7.5 3.36 7.5 7.5 0 4.14-3.36 7.5-7.5 7.5-4.14 0-7.5-3.36-7.5-7.5 0-4.14 3.36-7.5 7.5-7.5z"/>
+  
+  <!-- Data processing nodes -->
+  <path d="M8 9.5a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm8 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm-4 7a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+  
+  <!-- Connection lines representing data flow -->
+  <path d="M8.5 8l7 0M12 9.5l0 4"/>
+</svg>
