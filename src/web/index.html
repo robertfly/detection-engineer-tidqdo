@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    
+    <!-- Primary Meta Tags -->
+    <meta name="description" content="AI-Driven Detection Engineering Platform for automated security detection creation and management">
+    <meta name="theme-color" content="#1976D2" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1E1E1E" media="(prefers-color-scheme: dark)">
+    
+    <!-- Apple Mobile Web App Meta -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="AI Detection Engineering Platform">
+    <meta property="og:description" content="Enterprise-grade detection engineering automation platform">
+    <meta property="og:image" content="/og-image.png">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'nonce-${VITE_CSP_NONCE}' https://www.datadoghq-browser-agent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.detection-platform.com https://www.datadoghq-browser-agent.com">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
+    
+    <title>AI Detection Engineering Platform</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="/src/assets/icons/logo.svg">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Preconnect for Performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Fonts with Performance Optimization -->
+    <link 
+        rel="stylesheet" 
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" 
+        media="print" 
+        onload="this.media='all'"
+    >
+    <link 
+        rel="stylesheet" 
+        href="https://fonts.googleapis.com/icon?family=Material+Icons" 
+        media="print" 
+        onload="this.media='all'"
+    >
+    
+    <!-- Preload Critical Assets -->
+    <link 
+        rel="preload" 
+        href="/src/assets/images/logo-light.png" 
+        as="image" 
+        media="(prefers-color-scheme: light)"
+    >
+    <link 
+        rel="preload" 
+        href="/src/assets/images/logo-dark.png" 
+        as="image" 
+        media="(prefers-color-scheme: dark)"
+    >
+    
+    <!-- Critical CSS Inline -->
+    <style>
+        /* Initial loading state styles */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #FFFFFF;
+            transition: opacity 0.2s ease-out;
+        }
+        @media (prefers-color-scheme: dark) {
+            #splash-screen {
+                background-color: #1E1E1E;
+            }
+        }
+        .loading-indicator {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #1976D2;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Application Root -->
+    <div id="root" role="main" aria-label="Application content"></div>
+    
+    <!-- Portal Container for Modals -->
+    <div id="portal" role="presentation"></div>
+    
+    <!-- Initial Loading State -->
+    <div id="splash-screen" aria-hidden="true">
+        <div class="loading-indicator" role="progressbar" aria-label="Loading application"></div>
+    </div>
+    
+    <!-- Noscript Fallback -->
+    <noscript>
+        <div style="padding: 20px; text-align: center;">
+            <h1>JavaScript Required</h1>
+            <p>This application requires JavaScript to be enabled. Please enable JavaScript and reload the page.</p>
+        </div>
+    </noscript>
+    
+    <!-- Application Entry Script -->
+    <script type="module" src="/src/index.tsx" nonce="${VITE_CSP_NONCE}"></script>
+    
+    <!-- DataDog RUM Integration -->
+    <script 
+        src="https://www.datadoghq-browser-agent.com/datadog-rum.js" 
+        type="text/javascript" 
+        nonce="${VITE_CSP_NONCE}"
+    ></script>
+</body>
+</html>
