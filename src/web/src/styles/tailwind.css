@@ -1,0 +1,228 @@
+/* AI Detection Platform - Tailwind CSS Configuration
+ * Version: 1.0.0
+ * Implements Material Design 3.0 with enhanced accessibility
+ * @tailwindcss/v3.3+
+ */
+
+@import './variables.css';
+@import './themes.css';
+@import './global.css';
+
+/* Base Layer Configuration
+-------------------------------------------------- */
+@tailwind base;
+
+@layer base {
+  /* Typography Scale */
+  html {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+    contain: content;
+  }
+
+  /* Heading Styles */
+  h1 { @apply text-4xl font-semibold leading-tight mb-6; }
+  h2 { @apply text-3xl font-semibold leading-tight mb-5; }
+  h3 { @apply text-2xl font-semibold leading-tight mb-4; }
+  h4 { @apply text-xl font-semibold leading-tight mb-3; }
+  h5 { @apply text-lg font-semibold leading-tight mb-2; }
+  h6 { @apply text-base font-semibold leading-tight mb-2; }
+}
+
+/* Components Layer
+-------------------------------------------------- */
+@tailwind components;
+
+@layer components {
+  /* Theme Classes */
+  .theme-light {
+    @apply bg-white text-gray-900;
+    @apply high-contrast:text-black high-contrast:bg-white;
+    color-scheme: light;
+  }
+
+  .theme-dark {
+    @apply bg-gray-900 text-gray-50;
+    @apply high-contrast:text-white high-contrast:bg-black;
+    color-scheme: dark;
+  }
+
+  /* Container Queries */
+  .container-query {
+    container-type: inline-size;
+    container-name: layout;
+  }
+
+  /* Accessibility Components */
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2;
+  }
+
+  .high-contrast {
+    @apply text-black dark:text-white border-current;
+  }
+}
+
+/* Utilities Layer
+-------------------------------------------------- */
+@tailwind utilities;
+
+@layer utilities {
+  /* Responsive Utilities */
+  @variants responsive {
+    .text-balance {
+      text-wrap: balance;
+    }
+
+    .content-visibility-auto {
+      content-visibility: auto;
+    }
+  }
+
+  /* Motion Safe/Reduce Utilities */
+  @variants motion-safe {
+    .transition-theme {
+      @apply transition-colors duration-200 ease-in-out;
+    }
+  }
+
+  @variants motion-reduce {
+    .transition-none {
+      @apply transition-none;
+    }
+  }
+
+  /* Container Query Utilities */
+  @container (min-width: 600px) {
+    .container-md {
+      @apply px-6;
+    }
+  }
+
+  @container (min-width: 1240px) {
+    .container-lg {
+      @apply px-8;
+    }
+  }
+}
+
+/* Media Queries
+-------------------------------------------------- */
+/* Mobile: <600px */
+@media (max-width: 599px) {
+  html {
+    font-size: 14px;
+    @apply content-visibility-auto;
+  }
+
+  .container {
+    @apply px-4;
+  }
+}
+
+/* Tablet: 600-1239px */
+@media (min-width: 600px) and (max-width: 1239px) {
+  html {
+    font-size: 15px;
+    @apply content-visibility-auto;
+  }
+
+  .container {
+    @apply px-6;
+  }
+}
+
+/* Desktop: ≥1240px */
+@media (min-width: 1240px) {
+  html {
+    font-size: 16px;
+    @apply content-visibility-auto;
+  }
+
+  .container {
+    @apply px-8;
+  }
+}
+
+/* High Contrast Mode
+-------------------------------------------------- */
+@media (forced-colors: active) {
+  .forced-colors-mode {
+    @apply border-[ButtonText] text-[ButtonText];
+  }
+}
+
+/* Print Styles
+-------------------------------------------------- */
+@media print {
+  html {
+    @apply text-[12pt];
+  }
+
+  body {
+    @apply bg-white text-black;
+  }
+
+  .no-print {
+    @apply hidden;
+  }
+}
+
+/* Performance Optimizations
+-------------------------------------------------- */
+/* Critical CSS Optimization */
+.critical-path {
+  @apply content-visibility-auto;
+}
+
+/* GPU Acceleration */
+.gpu-accelerated {
+  @apply transform-gpu backface-hidden;
+}
+
+/* Reduced Data Mode */
+@media (prefers-reduced-data: reduce) {
+  img {
+    @apply filter blur-sm;
+  }
+
+  .reduced-data {
+    @apply grayscale;
+  }
+}
+
+/* Accessibility Enhancements
+-------------------------------------------------- */
+/* Focus Management */
+.focus-visible {
+  @apply outline-none ring-2 ring-primary-500 ring-offset-2;
+}
+
+/* Screen Reader Only */
+.sr-only {
+  @apply absolute w-px h-px p-0 -m-px overflow-hidden whitespace-nowrap border-0;
+}
+
+/* Color Contrast Utilities */
+.contrast-enhanced {
+  @apply text-black dark:text-white;
+}
+
+/* Container Layout
+-------------------------------------------------- */
+.layout-container {
+  @apply mx-auto w-full;
+  @apply sm:max-w-[600px] md:max-w-[1240px] lg:max-w-[1440px];
+  @apply px-4 sm:px-6 lg:px-8;
+}
+
+/* Theme Transitions
+-------------------------------------------------- */
+.theme-transition {
+  @apply transition-colors duration-200 ease-in-out motion-reduce:transition-none;
+}
