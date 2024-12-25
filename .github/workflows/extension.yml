@@ -1,0 +1,215 @@
+name: Chrome Extension CI/CD
+
+# Trigger workflow on pushes/PRs to main/develop branches and manual dispatch
+on:
+  push:
+    branches: [main, develop]
+    paths: ['src/web/chrome-extension/**']
+  pull_request:
+    branches: [main, develop]
+    paths: ['src/web/chrome-extension/**']
+  workflow_dispatch:
+
+# Define required permissions
+permissions:
+  contents: read
+  deployments: write
+  id-token: write
+  security-events: write
+
+# Environment variables
+env:
+  NODE_VERSION: '18.x'
+  COVERAGE_THRESHOLD: '85'
+  ARTIFACT_RETENTION_DAYS: '90'
+
+jobs:
+  # Validate and test extension
+  test:
+    name: Test Extension
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'src/web/package.json'
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/node_modules
+            ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        working-directory: src/web
+        run: |
+          npm ci --audit
+          npm audit fix --force
+
+      - name: Run ESLint
+        working-directory: src/web
+        run: npm run lint -- --max-warnings 0
+
+      - name: Type check
+        working-directory: src/web
+        run: npm run typecheck
+
+      - name: Run tests with coverage
+        working-directory: src/web
+        run: |
+          npm run test:coverage -- --coverageThreshold='{"global":{"statements":${{ env.COVERAGE_THRESHOLD }},"branches":${{ env.COVERAGE_THRESHOLD }},"functions":${{ env.COVERAGE_THRESHOLD }},"lines":${{ env.COVERAGE_THRESHOLD }}}}'
+
+      - name: Run CodeQL analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          languages: javascript
+          queries: security-extended,security-and-quality
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: src/web/coverage
+          retention-days: ${{ env.ARTIFACT_RETENTION_DAYS }}
+
+  # Build and package extension
+  build:
+    name: Build Extension
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'src/web/package.json'
+
+      - name: Install dependencies
+        working-directory: src/web
+        run: npm ci --audit
+
+      - name: Build extension
+        working-directory: src/web
+        run: |
+          npm run build
+          npm run preview -- --outDir chrome-extension-dist
+
+      - name: Generate build metadata
+        run: |
+          echo "BUILD_TIME=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+          echo "GIT_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
+          echo "VERSION=$(node -p "require('./src/web/chrome-extension/manifest.json').version")" >> $GITHUB_ENV
+
+      - name: Package extension
+        working-directory: src/web
+        run: |
+          zip -r ../chrome-extension-${{ env.VERSION }}.zip chrome-extension-dist/*
+          echo "PACKAGE_HASH=$(sha256sum ../chrome-extension-${{ env.VERSION }}.zip | cut -d' ' -f1)" >> $GITHUB_ENV
+
+      - name: Upload extension artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: chrome-extension-package
+          path: chrome-extension-${{ env.VERSION }}.zip
+          retention-days: ${{ env.ARTIFACT_RETENTION_DAYS }}
+          if-no-files-found: error
+
+  # Publish to Chrome Web Store
+  publish:
+    name: Publish Extension
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 30
+    
+    steps:
+      - name: Download extension package
+        uses: actions/download-artifact@v3
+        with:
+          name: chrome-extension-package
+
+      - name: Verify package integrity
+        run: |
+          echo "${{ env.PACKAGE_HASH }} chrome-extension-${{ env.VERSION }}.zip" | sha256sum --check
+
+      - name: Authenticate with Chrome Web Store
+        run: |
+          echo "${{ secrets.CHROME_CLIENT_SECRET }}" > client_secret.json
+          TOKEN=$(curl -s -X POST \
+            -d "client_id=${{ secrets.CHROME_CLIENT_ID }}&client_secret=${{ secrets.CHROME_CLIENT_SECRET }}&refresh_token=${{ secrets.CHROME_REFRESH_TOKEN }}&grant_type=refresh_token" \
+            https://accounts.google.com/o/oauth2/token | jq -r .access_token)
+          echo "WEBSTORE_TOKEN=${TOKEN}" >> $GITHUB_ENV
+
+      - name: Upload to Chrome Web Store
+        run: |
+          RESPONSE=$(curl -s -H "Authorization: Bearer ${WEBSTORE_TOKEN}" \
+            -H "x-goog-api-version: 2" \
+            -X PUT -T chrome-extension-${{ env.VERSION }}.zip \
+            https://www.googleapis.com/upload/chromewebstore/v1.1/items/${{ secrets.CHROME_EXTENSION_ID }})
+          
+          if [[ $(echo $RESPONSE | jq -r .uploadState) != "SUCCESS" ]]; then
+            echo "Upload failed: $RESPONSE"
+            exit 1
+          fi
+
+      - name: Publish extension
+        run: |
+          RESPONSE=$(curl -s -H "Authorization: Bearer ${WEBSTORE_TOKEN}" \
+            -H "x-goog-api-version: 2" \
+            -H "Content-Length: 0" \
+            -X POST \
+            https://www.googleapis.com/chromewebstore/v1.1/items/${{ secrets.CHROME_EXTENSION_ID }}/publish)
+          
+          if [[ $(echo $RESPONSE | jq -r .status[0]) != "OK" ]]; then
+            echo "Publication failed: $RESPONSE"
+            exit 1
+          fi
+
+      - name: Verify deployment
+        run: |
+          MAX_ATTEMPTS=10
+          ATTEMPT=1
+          
+          while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
+            STATUS=$(curl -s -H "Authorization: Bearer ${WEBSTORE_TOKEN}" \
+              -H "x-goog-api-version: 2" \
+              https://www.googleapis.com/chromewebstore/v1.1/items/${{ secrets.CHROME_EXTENSION_ID }} | \
+              jq -r .status[0])
+            
+            if [ "$STATUS" = "OK" ]; then
+              echo "Extension successfully published!"
+              exit 0
+            fi
+            
+            echo "Attempt $ATTEMPT: Waiting for publication to complete..."
+            sleep 30
+            ATTEMPT=$((ATTEMPT + 1))
+          done
+          
+          echo "Failed to verify deployment after $MAX_ATTEMPTS attempts"
+          exit 1
+
+      - name: Cleanup sensitive files
+        if: always()
+        run: rm -f client_secret.json
