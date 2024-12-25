@@ -1,0 +1,30 @@
+# Service manifest for Loki log aggregation system
+# Version: 1.0.0
+# Provides internal cluster access for log ingestion and querying
+apiVersion: v1
+kind: Service
+metadata:
+  name: loki
+  namespace: detection-platform-monitoring
+  labels:
+    app: loki
+    component: logging
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "3100"
+spec:
+  type: ClusterIP  # Ensures internal-only access within the cluster
+  ports:
+    # HTTP port for log queries and Prometheus metrics collection
+    - name: http
+      port: 3100
+      targetPort: http
+      protocol: TCP
+    # gRPC port for high-performance log ingestion
+    - name: grpc
+      port: 9096
+      targetPort: grpc
+      protocol: TCP
+  selector:
+    app: loki  # Targets Loki deployment pods
+  sessionAffinity: None  # Optimizes load distribution across pods
