@@ -1,0 +1,125 @@
+# Network Policies for AI-Driven Detection Engineering Platform
+# Version: 1.0
+# Implements zero-trust networking principles with granular pod-to-pod communication controls
+# Compliance: SOC2, HIPAA, GDPR
+
+---
+# Default deny-all policy to enforce zero-trust networking
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  annotations:
+    policy.network.kubernetes.io/description: "Global deny-all policy for zero-trust implementation"
+    security.detection-platform.io/compliance: "SOC2,HIPAA,GDPR"
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+
+---
+# Allow ingress traffic from NGINX ingress controller
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-ingress-traffic
+  annotations:
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    policy.network.kubernetes.io/description: "Allow ingress traffic from NGINX ingress controller with rate limiting"
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: web
+      app.kubernetes.io/part-of: detection-platform
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - port: 80
+      protocol: TCP
+    - port: 443
+      protocol: TCP
+
+---
+# Allow monitoring tools to scrape metrics
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-monitoring
+  annotations:
+    policy.network.kubernetes.io/description: "Allow monitoring tools to scrape metrics endpoints"
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: detection-platform-monitoring
+    ports:
+    - port: 9090
+      protocol: TCP
+
+---
+# Allow bi-directional communication between backend and web services
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-backend-web
+  annotations:
+    policy.network.kubernetes.io/description: "Allow bi-directional communication between backend and web services"
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/component: backend
+      app.kubernetes.io/part-of: detection-platform
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/component: web
+          app.kubernetes.io/part-of: detection-platform
+    ports:
+    - port: 8080
+      protocol: TCP
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/component: web
+          app.kubernetes.io/part-of: detection-platform
+    ports:
+    - port: 3000
+      protocol: TCP
+
+---
+# Allow DNS resolution for all pods
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns
+  annotations:
+    policy.network.kubernetes.io/description: "Allow DNS resolution for all pods"
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    ports:
+    - port: 53
+      protocol: UDP
+    - port: 53
+      protocol: TCP
