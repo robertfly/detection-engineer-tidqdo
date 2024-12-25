@@ -1,0 +1,165 @@
+[[package]]
+name = "fastapi"
+version = "0.104.0"
+description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "fastapi-0.104.0-py3-none-any.whl", hash = "sha256:c9f54cc9f4f36c6f61c5c82e40f96fd7ae936f78d4ed6e5b6d0b7a15dcdcc3f0"},
+    {file = "fastapi-0.104.0.tar.gz", hash = "sha256:583e13570df3f6f57a12f145b13c7a54d0e6b185b69c53c72d9887cc9d0e5c47"}
+]
+
+[package.dependencies]
+pydantic = ">=2.0.0"
+starlette = ">=0.27.0"
+
+[[package]]
+name = "pydantic"
+version = "2.0.0"
+description = "Data validation using Python type hints"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pydantic-2.0.0-py3-none-any.whl", hash = "sha256:5fd2e8c282c2a9f89a285c5f2f4f5b0e2c2d44963a0c94f85b4fdd8aeb6d6af1"},
+    {file = "pydantic-2.0.0.tar.gz", hash = "sha256:b7757e2e1c2a1c8f115b1335cc88a94a51d3404f8d384c4a3c70b3f2e0e8f31e"}
+]
+
+[[package]]
+name = "sqlalchemy"
+version = "2.0.0"
+description = "Database Abstraction Library"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "SQLAlchemy-2.0.0-cp311-cp311-win_amd64.whl", hash = "sha256:2e216c13ecc7fcdcbb86bb3225425782db56c1316c3f9b8c310d02b5b79bf67f"},
+    {file = "SQLAlchemy-2.0.0.tar.gz", hash = "sha256:91c54ca8345008fceaec987e10924bf07dcab36c442925357e5a467b36a38319"}
+]
+
+[[package]]
+name = "langchain"
+version = "0.1.0"
+description = "Building applications with LLMs through composability"
+category = "main"
+optional = false
+python-versions = ">=3.8.1"
+files = [
+    {file = "langchain-0.1.0-py3-none-any.whl", hash = "sha256:f50f1d6a7544f1f33322f4d5f36781a4d0d244f10d5d2ec74d5a5c65168e8e4c"}
+]
+
+[[package]]
+name = "transformers"
+version = "4.35.0"
+description = "State-of-the-art Machine Learning for JAX, PyTorch and TensorFlow"
+category = "main"
+optional = false
+python-versions = ">=3.8.0"
+files = [
+    {file = "transformers-4.35.0-py3-none-any.whl", hash = "sha256:7e1fa9242c36b0d876e120e873c84d0f59b6b25c0c459b7d60ab3f4243f3b6f3"}
+]
+
+[[package]]
+name = "torch"
+version = "2.1.0"
+description = "Tensors and Dynamic neural networks in Python with strong GPU acceleration"
+category = "main"
+optional = false
+python-versions = ">=3.8.0"
+files = [
+    {file = "torch-2.1.0-cp311-cp311-win_amd64.whl", hash = "sha256:8ced00b3ba471856b993822508f77c98f48a458623596a4c43136158781e306a"}
+]
+
+[[package]]
+name = "scikit-learn"
+version = "1.3.0"
+description = "A set of python modules for machine learning and data mining"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "scikit-learn-1.3.0-cp311-cp311-win_amd64.whl", hash = "sha256:4f4a1ceeb9fa2b27da2f91e9798d2097b1f75e88f4d5e9d2c9391b8d0d12d77a"}
+]
+
+[[package]]
+name = "beautifulsoup4"
+version = "4.12.0"
+description = "Screen-scraping library"
+category = "main"
+optional = false
+python-versions = ">=3.6.0"
+files = [
+    {file = "beautifulsoup4-4.12.0-py3-none-any.whl", hash = "sha256:2130a5ad7f25f9d31c724082d4e9f956c4f2a2f2366d832403a6f6c4c3c5f4a8"}
+]
+
+[[package]]
+name = "requests"
+version = "2.31.0"
+description = "Python HTTP for Humans."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "requests-2.31.0-py3-none-any.whl", hash = "sha256:58cd2187c01e70e6e26505bca751777aa9f2ee0b7f4300988b709f44e013003f"}
+]
+
+[[package]]
+name = "PyJWT"
+version = "2.8.0"
+description = "JSON Web Token implementation in Python"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "PyJWT-2.8.0-py3-none-any.whl", hash = "sha256:59127c392cc44c2da5bb3192169a91f429924e17aff6534d70fdc02ab3e04320"}
+]
+
+[[package]]
+name = "redis"
+version = "5.0.0"
+description = "Python client for Redis database and key-value store"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "redis-5.0.0-py3-none-any.whl", hash = "sha256:06570d0b2d84d46c21defc550afbaada381af82f5b83e5b3777600e05d8e2ed0"}
+]
+
+[[package]]
+name = "elasticsearch"
+version = "8.0.0"
+description = "Python client for Elasticsearch"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "elasticsearch-8.0.0-py3-none-any.whl", hash = "sha256:0e11c9a31950d3175c7a5363e9439c5a6a574735063492d0d3c8945e84c1c6f4"}
+]
+
+[[package]]
+name = "pytest"
+version = "7.4.0"
+description = "pytest: simple powerful testing with Python"
+category = "dev"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pytest-7.4.0-py3-none-any.whl", hash = "sha256:78bf16451a2eb8c7a2ea98e32dc119fd2aa758f1d5d66dbf0a59d69a3969df32"}
+]
+
+[[package]]
+name = "black"
+version = "23.9.0"
+description = "The uncompromising code formatter."
+category = "dev"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "black-23.9.0-py3-none-any.whl", hash = "sha256:9b3f8d1f255a9f2b8d0dec87c99a9c2fe6ed69a8c96661f9d2e745477f9b9e7b"}
+]
+
+[metadata]
+lock-version = "2.0"
+python-versions = "^3.11"
+content-hash = "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
