@@ -1,0 +1,59 @@
+# HorizontalPodAutoscaler configuration for web frontend
+# Version: v2 autoscaling API
+# Scaling thresholds: CPU 75%, Memory 80%
+# Replicas: min 3, max 10
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: web-hpa
+  namespace: ${ENV}  # detection-platform-prod or detection-platform-staging
+  labels:
+    app: detection-platform
+    component: web
+    environment: ${ENV}
+spec:
+  # Target the web frontend deployment
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web-deployment
+  
+  # Replica range for high availability
+  minReplicas: 3  # Ensures minimum HA configuration
+  maxReplicas: 10 # Maximum scale for peak loads
+  
+  # Scaling metrics
+  metrics:
+    # CPU-based scaling
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 75  # Trigger scale up at 75% CPU utilization
+    
+    # Memory-based scaling
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80  # Trigger scale up at 80% memory utilization
+  
+  # Scaling behavior configuration
+  behavior:
+    # Scale up behavior
+    scaleUp:
+      stabilizationWindowSeconds: 60  # 1-minute window for scale-up decisions
+      policies:
+        - type: Pods
+          value: 2                    # Add up to 2 pods
+          periodSeconds: 60           # Per minute
+    
+    # Scale down behavior
+    scaleDown:
+      stabilizationWindowSeconds: 300 # 5-minute window for scale-down decisions
+      policies:
+        - type: Pods
+          value: 1                    # Remove 1 pod
+          periodSeconds: 60           # Per minute
