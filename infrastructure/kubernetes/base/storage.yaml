@@ -1,0 +1,93 @@
+---
+# StorageClass for encrypted GP3 EBS volumes
+# aws-ebs-csi-driver version: 2.x
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp3-encrypted
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+spec:
+  provisioner: kubernetes.io/aws-ebs
+  parameters:
+    type: gp3
+    encrypted: "true"
+    fsType: ext4
+    kmsKeyId: ${AWS_KMS_KEY_ID}
+    iops: "3000"  # Baseline IOPS for GP3
+    throughput: "125"  # Baseline throughput in MiB/s
+  reclaimPolicy: Retain
+  allowVolumeExpansion: true
+  volumeBindingMode: WaitForFirstConsumer  # Enables multi-AZ support
+
+---
+# PostgreSQL PVC - Production Database Storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-data
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "gp3-encrypted"
+    backup.velero.io/backup-volumes: "postgres-data"
+    encryption.aws.com/kms-key-id: ${AWS_KMS_KEY_ID}
+spec:
+  storageClassName: gp3-encrypted
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+
+---
+# MongoDB PVC - Detection Storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongodb-data
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "gp3-encrypted"
+    backup.velero.io/backup-volumes: "mongodb-data"
+    encryption.aws.com/kms-key-id: ${AWS_KMS_KEY_ID}
+spec:
+  storageClassName: gp3-encrypted
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+
+---
+# Elasticsearch PVC - Search Index Storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: elasticsearch-data
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "gp3-encrypted"
+    backup.velero.io/backup-volumes: "elasticsearch-data"
+    encryption.aws.com/kms-key-id: ${AWS_KMS_KEY_ID}
+spec:
+  storageClassName: gp3-encrypted
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 150Gi
+
+---
+# Redis PVC - Cache Storage
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "gp3-encrypted"
+    backup.velero.io/backup-volumes: "redis-data"
+    encryption.aws.com/kms-key-id: ${AWS_KMS_KEY_ID}
+spec:
+  storageClassName: gp3-encrypted
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
