@@ -1,0 +1,91 @@
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist
+coverage
+
+# Version control
+.git
+.gitignore
+
+# Environment and secrets
+.env*
+.env.local
+.env.development
+.env.test
+.env.production
+*.pem
+*.key
+
+# Development tools and configurations
+.eslintrc*
+.prettierrc*
+jest.config.ts
+.dockerignore
+docker-compose.yml
+README.md
+
+# Test files
+*.test.ts
+*.test.tsx
+tests
+coverage
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Debug logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Documentation
+*.md
+docs/
+
+# Temporary files
+*.tmp
+.cache/
+
+# Development certificates
+*.crt
+*.key
+*.pem
+
+# Local development overrides
+docker-compose.override.yml
+
+# TypeScript source maps
+*.map
+
+# Development assets
+__mocks__/
+__tests__/
+test-results/
+junit.xml
+
+# Dependency lock files (will be regenerated)
+package-lock.json
+yarn.lock
+
+# Build and development scripts
+scripts/
+config/
+
+# Development configurations
+.editorconfig
+.browserslistrc
+tsconfig.json
+babel.config.js
+postcss.config.js
