@@ -1,0 +1,165 @@
+# AI-Driven Detection Engineering Platform .gitignore
+# Version: 1.0
+
+# Python Development
+*.py[cod]
+__pycache__/
+*.so
+.Python
+env/
+venv/
+.env
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+pytype/
+.coverage
+.mypy_cache/
+*.pyc
+*.pyo
+*.pyd
+.python-version
+celerybeat-schedule
+*.sage.py
+.ipynb_checkpoints
+.env.local
+.env.*.local
+
+# Node.js Development
+node_modules/
+.npm
+*.log
+dist/
+build/
+.env
+.env.local
+.env.*.local
+.pnpm-store/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
+.yarn/
+.yarnrc
+.pnp.*
+coverage/
+.eslintcache
+
+# IDE and Editor Files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.settings/
+.project
+.classpath
+.factorypath
+*.sublime-workspace
+*.sublime-project
+.netbeans/
+.metals/
+.bloop/
+
+# Operating System Files
+.DS_Store
+Thumbbs.db
+*.bak
+*.tmp
+*.temp
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# Testing and Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+coverage/
+.nyc_output/
+test-results/
+test-report/
+test-output/
+reports/
+.tox/
+
+# Infrastructure and Deployment
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraformrc
+terraform.rc
+kubeconfig
+*.tfvars
+.terraform.lock.hcl
+charts/*.tgz
+.helm/
+.vagrant/
+
+# AI/ML Artifacts
+models/
+checkpoints/
+*.ckpt
+*.pth
+*.h5
+*.model
+*.bin
+trained_models/
+data/raw/
+data/processed/
+wandb/
+mlruns/
+tensorboard/
+
+# Security and Credentials
+*.key
+*.pem
+*.crt
+*.csr
+*.p12
+*.pfx
+*.der
+secrets/
+*_rsa
+*_dsa
+*_ed25519
+*_ecdsa
+.gnupg/
+.ssh/
+kubernetes/secrets/
+.kube/
+.aws/
+.azure/
+.gcloud/
+
+# Detection Engineering Specific
+detections/local/
+*.sigma.local
+*.yara.local
+*.rules.local
+test_data/
+sample_logs/
+*.detection.bak
+
+# Dependency Lock Files
+# Keep package-lock.json and poetry.lock for reproducible builds
+yarn.lock
+pnpm-lock.yaml
+
+# Build Output
+/dist/
+/build/
+/out/
+/.next/
+/.nuxt/
+/.output/
+
+# Local Development Overrides
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+docker-compose.override.yml
