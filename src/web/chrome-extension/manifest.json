@@ -1,0 +1,64 @@
+{
+  "manifest_version": 3,
+  "name": "AI Detection Platform",
+  "version": "1.0.0",
+  "description": "AI-powered threat intelligence capture and detection engineering platform",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "alarms",
+    "notifications"
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "assets/icons/logo-16.png",
+      "32": "assets/icons/logo-32.png",
+      "48": "assets/icons/logo-48.png",
+      "128": "assets/icons/logo-128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "assets/icons/logo-16.png",
+    "32": "assets/icons/logo-32.png",
+    "48": "assets/icons/logo-48.png",
+    "128": "assets/icons/logo-128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/*"
+      ],
+      "matches": [
+        "*://*/*"
+      ]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://*.ai-detection-platform.com"
+  },
+  "minimum_chrome_version": "88",
+  "author": "AI Detection Platform Team",
+  "homepage_url": "https://ai-detection-platform.com",
+  "incognito": "split",
+  "update_url": "https://ai-detection-platform.com/updates.xml"
+}
