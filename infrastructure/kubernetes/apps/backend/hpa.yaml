@@ -1,0 +1,123 @@
+# HorizontalPodAutoscaler configuration for AI-Driven Detection Engineering platform backend services
+# Version: v2 (Kubernetes 1.23+)
+# Maintains optimal performance with CPU/Memory based scaling and behavior policies
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: backend-hpa
+  namespace: detection-platform-prod  # Also supports detection-platform-staging
+  labels:
+    app: backend
+    component: api
+    part-of: detection-platform
+  annotations:
+    description: "Advanced autoscaling configuration for backend deployment"
+    monitoring.policy: "high-priority"
+    scaling.policy: "performance-optimized"
+
+spec:
+  # Target the backend deployment for scaling
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: backend
+
+  # Scaling limits to ensure high availability (99.9%)
+  minReplicas: 3
+  maxReplicas: 10
+
+  # Resource utilization targets for scaling decisions
+  metrics:
+    # CPU-based scaling (target: 70%)
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    
+    # Memory-based scaling (target: 80%)
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+
+  # Advanced scaling behavior configuration
+  behavior:
+    # Scale up behavior - Aggressive for performance
+    scaleUp:
+      # Quick response to increased load
+      stabilizationWindowSeconds: 60
+      policies:
+        # Allow adding up to 2 pods every 60 seconds
+        - type: Pods
+          value: 2
+          periodSeconds: 60
+      selectPolicy: Max  # Use most aggressive policy
+
+    # Scale down behavior - Conservative to prevent thrashing
+    scaleDown:
+      # Longer window to ensure load decrease is sustained
+      stabilizationWindowSeconds: 300
+      policies:
+        # Remove 1 pod every 120 seconds at most
+        - type: Pods
+          value: 1
+          periodSeconds: 120
+      selectPolicy: Max  # Use most conservative policy
+
+---
+# HorizontalPodAutoscaler for staging environment
+# Identical configuration but different namespace
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: backend-hpa
+  namespace: detection-platform-staging
+  labels:
+    app: backend
+    component: api
+    part-of: detection-platform
+    environment: staging
+  annotations:
+    description: "Advanced autoscaling configuration for backend deployment (staging)"
+    monitoring.policy: "high-priority"
+    scaling.policy: "performance-optimized"
+
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: backend
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Pods
+          value: 2
+          periodSeconds: 60
+      selectPolicy: Max
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Pods
+          value: 1
+          periodSeconds: 120
+      selectPolicy: Max
