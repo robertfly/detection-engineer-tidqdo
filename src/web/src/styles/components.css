@@ -1,0 +1,238 @@
+/**
+ * Component-specific CSS styles for AI Detection Platform
+ * Version: 1.0.0
+ * Implements Material Design 3.0 with WCAG 2.1 AA compliance
+ * Dependencies: tailwindcss@3.3+
+ */
+
+@import './variables.css';
+@import './themes.css';
+
+/* Base Component Styles
+-------------------------------------------------- */
+.component-base {
+  font-family: var(--font-family-base);
+  border-radius: var(--border-radius);
+  transition: all var(--transition-normal);
+  contain: layout style paint;
+  print-color-adjust: exact;
+}
+
+/* Button Components
+-------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-4) var(--spacing-8);
+  border-radius: var(--border-radius);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  transition: all var(--transition-normal);
+  position: relative;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  contain: content;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Card Components
+-------------------------------------------------- */
+.card {
+  background-color: var(--surface-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-4);
+  contain: content;
+  overflow: hidden;
+  position: relative;
+  transition: transform var(--transition-normal),
+              box-shadow var(--transition-normal);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Input Components
+-------------------------------------------------- */
+.input {
+  width: 100%;
+  padding: var(--spacing-4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--background-paper);
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  transition: border-color var(--transition-normal),
+              box-shadow var(--transition-normal);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--focus-ring);
+}
+
+/* Accessibility Enhancements
+-------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .card,
+  .input,
+  [class*="transition"] {
+    transition: none !important;
+    transform: none !important;
+    animation: none !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--focus-ring);
+}
+
+/* Responsive Design
+-------------------------------------------------- */
+@media (max-width: 599px) {
+  .btn {
+    padding: var(--spacing-3) var(--spacing-6);
+    font-size: var(--font-size-base);
+    width: 100%;
+  }
+
+  .card {
+    padding: var(--spacing-3);
+    margin: var(--spacing-2);
+  }
+
+  .input {
+    font-size: 16px; /* Prevent zoom on iOS */
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 1239px) {
+  .btn {
+    padding: var(--spacing-4) var(--spacing-8);
+  }
+
+  .card {
+    padding: var(--spacing-4);
+    margin: var(--spacing-3);
+  }
+}
+
+/* Container Queries for Enhanced Responsive Design
+-------------------------------------------------- */
+@container (min-width: 30em) {
+  .card {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-4);
+  }
+}
+
+@container (min-width: 50em) {
+  .card {
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-6);
+  }
+}
+
+/* Print Styles
+-------------------------------------------------- */
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .btn,
+  .card,
+  .input {
+    border: 1px solid #000;
+  }
+
+  @page {
+    margin: 2cm;
+  }
+}
+
+/* Performance Optimizations
+-------------------------------------------------- */
+@layer utilities {
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: transform;
+  }
+
+  .content-visibility-auto {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px;
+  }
+}
+
+/* High Contrast Mode Support
+-------------------------------------------------- */
+@media (forced-colors: active) {
+  .btn,
+  .card,
+  .input {
+    border: 2px solid ButtonText;
+    forced-color-adjust: none;
+  }
+
+  .btn:focus,
+  .input:focus {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}
+
+/* Critical Rendering Path Optimization
+-------------------------------------------------- */
+@layer base {
+  .critical-component {
+    content-visibility: auto;
+    contain-intrinsic-size: auto;
+    will-change: auto;
+  }
+}
+
+/* RTL Support
+-------------------------------------------------- */
+[dir="rtl"] {
+  .btn,
+  .input {
+    text-align: right;
+  }
+}
