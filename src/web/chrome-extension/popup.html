@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Character encoding -->
+    <meta charset="UTF-8">
+
+    <!-- Viewport settings optimized for extension popup -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- Security headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.detection-platform.com">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+
+    <!-- Title -->
+    <title>AI Detection Platform - Intelligence Capture</title>
+
+    <!-- Critical CSS -->
+    <link rel="stylesheet" href="styles.css" type="text/css">
+
+    <!-- Resource hints for performance -->
+    <link rel="preload" href="popup.tsx" as="script">
+    <link rel="preconnect" href="https://api.detection-platform.com">
+
+    <!-- Theme color for browser UI -->
+    <meta name="theme-color" content="#1976D2">
+</head>
+<body>
+    <!-- Main container with ARIA attributes -->
+    <div 
+        id="popup-root" 
+        class="popup-container" 
+        role="main" 
+        aria-label="Intelligence Capture Interface"
+        data-secure-context="true"
+        data-csp-enabled="true"
+    >
+        <!-- Initial loading state -->
+        <div 
+            class="loading-indicator" 
+            role="progressbar" 
+            aria-label="Loading application"
+            aria-busy="true"
+        >
+            <div class="loading-spinner"></div>
+        </div>
+
+        <!-- Error boundary fallback -->
+        <div 
+            id="error-container" 
+            role="alert" 
+            aria-live="assertive" 
+            hidden
+        ></div>
+    </div>
+
+    <!-- Deferred script loading -->
+    <script type="module" src="popup.tsx" defer></script>
+
+    <!-- No-JS fallback -->
+    <noscript>
+        <div class="error-message" role="alert">
+            JavaScript must be enabled to use this extension.
+        </div>
+    </noscript>
+</body>
+</html>
