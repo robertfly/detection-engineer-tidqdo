@@ -1,0 +1,82 @@
+# Service manifest for AI-Driven Detection Engineering platform web frontend
+# Version: 1.0.0
+# Supports high availability (99.9% uptime) through multi-pod access
+# Integrates with AWS ALB via ingress for external access
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+  labels:
+    app: detection-platform
+    component: web
+    environment: ${ENV}
+    managed-by: argocd
+  annotations:
+    # Enable Prometheus metrics scraping
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "80"
+    # AWS Load Balancer specific annotations
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    # Datadog monitoring integration
+    ad.datadoghq.com/service.check_names: '["http_check"]'
+    ad.datadoghq.com/service.init_configs: '[{}]'
+    ad.datadoghq.com/service.instances: |
+      [
+        {
+          "name": "Web Frontend Health",
+          "url": "http://%%host%%/health",
+          "timeout": 1
+        }
+      ]
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    app: detection-platform
+    component: web
+  sessionAffinity: None
+  publishNotReadyAddresses: false
+  # Ensure proper load distribution across pods
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+---
+# Network Policy to control traffic flow
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: web-service-network-policy
+  labels:
+    app: detection-platform
+    component: web
+    environment: ${ENV}
+    managed-by: argocd
+spec:
+  podSelector:
+    matchLabels:
+      app: detection-platform
+      component: web
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: detection-platform-${ENV}
+      ports:
+        - protocol: TCP
+          port: 80
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: detection-platform-${ENV}
+      ports:
+        - protocol: TCP
+          port: 80
