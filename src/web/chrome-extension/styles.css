@@ -1,0 +1,226 @@
+/**
+ * Chrome Extension Styles
+ * Version: 1.0.0
+ * Implements Material Design 3.0 with responsive design and accessibility
+ * Dependencies: tailwindcss@3.3+
+ */
+
+@import '../../src/styles/variables.css';
+@import '../../src/styles/themes.css';
+
+/* Reset and Base Styles
+-------------------------------------------------- */
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-sm); /* 14px base for extension */
+  line-height: var(--line-height-normal);
+  background-color: var(--background-default);
+  color: var(--text-primary);
+  contain: content;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Extension Container
+-------------------------------------------------- */
+.popup-container {
+  width: clamp(360px, 100%, 480px);
+  height: clamp(400px, 80vh, 600px);
+  min-width: 360px;
+  min-height: 400px;
+  overflow-y: auto;
+  padding: var(--spacing-4);
+  contain: layout size;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Capture Button
+-------------------------------------------------- */
+.capture-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: var(--spacing-3) var(--spacing-4);
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: background-color var(--transition-normal);
+  contain: content;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.capture-button:hover {
+  background-color: var(--primary-dark);
+}
+
+.capture-button:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(25, 118, 210, 0.2);
+}
+
+.capture-button:disabled {
+  background-color: var(--secondary-light);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Capture Preview
+-------------------------------------------------- */
+.capture-preview {
+  margin-top: var(--spacing-4);
+  padding: var(--spacing-3);
+  background-color: var(--background-paper);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  max-height: 400px;
+  overflow-y: auto;
+  contain: content;
+  will-change: contents;
+  backface-visibility: hidden;
+}
+
+.capture-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-3);
+}
+
+.capture-preview-content {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+}
+
+/* Loading States
+-------------------------------------------------- */
+.loading-indicator {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--primary-light);
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 0.8s linear infinite;
+  contain: strict;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Utility Classes
+-------------------------------------------------- */
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Dark Mode Support
+-------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  .capture-preview {
+    background-color: var(--background-paper);
+    border-color: var(--border-color);
+  }
+
+  .loading-indicator {
+    border-color: var(--primary-light);
+    border-top-color: transparent;
+  }
+}
+
+/* Accessibility: Reduced Motion
+-------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .capture-button {
+    transition: none;
+  }
+
+  .loading-indicator {
+    animation: none;
+  }
+
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High Contrast Mode
+-------------------------------------------------- */
+@media (forced-colors: active) {
+  .capture-button {
+    border: 2px solid ButtonText;
+  }
+
+  .capture-preview {
+    border: 2px solid ButtonText;
+  }
+}
+
+/* Print Styles
+-------------------------------------------------- */
+@media print {
+  .popup-container {
+    height: auto;
+    overflow: visible;
+  }
+
+  .capture-button {
+    display: none;
+  }
+
+  .capture-preview {
+    border: 1px solid #000;
+    max-height: none;
+  }
+}
+
+/* Performance Optimizations
+-------------------------------------------------- */
+* {
+  contain: layout style paint;
+}
+
+img, video {
+  content-visibility: auto;
+  contain: content;
+}
+
+/* Scrollbar Styling
+-------------------------------------------------- */
+.popup-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.popup-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.popup-container::-webkit-scrollbar-thumb {
+  background-color: var(--secondary-light);
+  border-radius: 4px;
+}
+
+.popup-container::-webkit-scrollbar-thumb:hover {
+  background-color: var(--secondary-color);
+}
