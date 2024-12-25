@@ -1,0 +1,128 @@
+/**
+ * Global CSS Custom Properties (Variables)
+ * Following Material Design 3.0 principles
+ * Version: 1.0.0
+ */
+
+:root {
+  /* Base Variables
+  -------------------------------------------------- */
+  --spacing-unit: 8px; /* Base spacing unit for consistent spacing scale */
+  --font-family-base: Inter, -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --font-size-base: 16px;
+  --line-height-normal: 1.5;
+  --line-height-tight: 1.25;
+  --line-height-relaxed: 1.75;
+  --transition-normal: 200ms ease-in-out;
+
+  /* Colors - Material Design 3.0
+  -------------------------------------------------- */
+  /* Primary Colors */
+  --primary-color: #1976D2;
+  --primary-light: #42A5F5;
+  --primary-dark: #1565C0;
+
+  /* Secondary Colors */
+  --secondary-color: #424242;
+  --secondary-light: #616161;
+  --secondary-dark: #212121;
+
+  /* Status Colors */
+  --error-color: #D32F2F;
+  --error-light: #EF5350;
+  --error-dark: #C62828;
+
+  --warning-color: #FFA000;
+  --warning-light: #FFB74D;
+  --warning-dark: #F57C00;
+
+  --info-color: #0288D1;
+  --info-light: #29B6F6;
+  --info-dark: #0277BD;
+
+  --success-color: #388E3C;
+  --success-light: #66BB6A;
+  --success-dark: #2E7D32;
+
+  /* Spacing Scale
+  -------------------------------------------------- */
+  --spacing-1: calc(var(--spacing-unit) * 0.25);  /* 2px */
+  --spacing-2: calc(var(--spacing-unit) * 0.5);   /* 4px */
+  --spacing-3: calc(var(--spacing-unit) * 0.75);  /* 6px */
+  --spacing-4: var(--spacing-unit);               /* 8px */
+  --spacing-6: calc(var(--spacing-unit) * 1.5);   /* 12px */
+  --spacing-8: calc(var(--spacing-unit) * 2);     /* 16px */
+  --spacing-12: calc(var(--spacing-unit) * 3);    /* 24px */
+  --spacing-16: calc(var(--spacing-unit) * 4);    /* 32px */
+  --spacing-24: calc(var(--spacing-unit) * 6);    /* 48px */
+  --spacing-32: calc(var(--spacing-unit) * 8);    /* 64px */
+  --spacing-48: calc(var(--spacing-unit) * 12);   /* 96px */
+  --spacing-64: calc(var(--spacing-unit) * 16);   /* 128px */
+
+  /* Typography
+  -------------------------------------------------- */
+  /* Font Weights */
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Font Sizes */
+  --font-size-xs: 0.75rem;      /* 12px */
+  --font-size-sm: 0.875rem;     /* 14px */
+  --font-size-base: 1rem;       /* 16px */
+  --font-size-lg: 1.125rem;     /* 18px */
+  --font-size-xl: 1.25rem;      /* 20px */
+  --font-size-2xl: 1.5rem;      /* 24px */
+  --font-size-3xl: 1.875rem;    /* 30px */
+  --font-size-4xl: 2.25rem;     /* 36px */
+  --font-size-5xl: 3rem;        /* 48px */
+  --font-size-6xl: 3.75rem;     /* 60px */
+
+  /* Letter Spacing */
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+
+  /* Breakpoints - Responsive Design
+  -------------------------------------------------- */
+  --breakpoint-mobile: 599px;
+  --breakpoint-tablet: 1239px;
+  --breakpoint-desktop: 1240px;
+  
+  /* Derived Breakpoints */
+  --breakpoint-mobile-max: calc(var(--breakpoint-mobile) - 1px);
+  --breakpoint-tablet-min: var(--breakpoint-mobile);
+  --breakpoint-tablet-max: calc(var(--breakpoint-tablet) - 1px);
+  --breakpoint-desktop-min: var(--breakpoint-desktop);
+
+  /* Transitions & Animations
+  -------------------------------------------------- */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 200ms ease-in-out;
+  --transition-slow: 300ms ease-in-out;
+  --transition-extra-slow: 500ms ease-in-out;
+
+  /* Material Design Easing Curves */
+  --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  --easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
+
+  /* Z-Index Scale
+  -------------------------------------------------- */
+  --z-index-dropdown: 1000;
+  --z-index-sticky: 1020;
+  --z-index-fixed: 1030;
+  --z-index-modal-backdrop: 1040;
+  --z-index-modal: 1050;
+  --z-index-popover: 1060;
+  --z-index-tooltip: 1070;
+  --z-index-notification: 1080;
+}
+
+/* Media Query Mixins for Responsive Design
+-------------------------------------------------- */
+@custom-media --mobile (max-width: var(--breakpoint-mobile-max));
+@custom-media --tablet (min-width: var(--breakpoint-tablet-min)) and (max-width: var(--breakpoint-tablet-max));
+@custom-media --desktop (min-width: var(--breakpoint-desktop-min));
