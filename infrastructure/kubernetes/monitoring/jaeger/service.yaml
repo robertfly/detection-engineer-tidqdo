@@ -1,0 +1,42 @@
+# Service manifest for Jaeger distributed tracing system
+# Version: 1.0.0
+# Exposes endpoints for query interface, collector, agent and Zipkin compatibility
+apiVersion: v1
+kind: Service
+metadata:
+  name: jaeger
+  namespace: detection-platform-monitoring
+  labels:
+    app: jaeger
+    component: tracing
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "16686"
+spec:
+  type: ClusterIP
+  selector:
+    app: jaeger
+  ports:
+    # Query UI and API endpoint for accessing and querying trace data
+    - name: query
+      port: 16686
+      targetPort: 16686
+      protocol: TCP
+    
+    # Collector endpoint for receiving and processing trace spans
+    - name: collector
+      port: 14268
+      targetPort: 14268
+      protocol: TCP
+    
+    # Agent endpoint for receiving trace data via UDP protocol
+    - name: agent
+      port: 6831
+      targetPort: 6831
+      protocol: UDP
+    
+    # Zipkin compatibility endpoint for receiving traces in Zipkin format
+    - name: zipkin
+      port: 9411
+      targetPort: 9411
+      protocol: TCP
