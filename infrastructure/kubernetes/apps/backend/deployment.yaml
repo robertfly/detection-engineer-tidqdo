@@ -1,0 +1,143 @@
+# Backend Deployment for AI-Driven Detection Engineering Platform
+# Version: v1.0.0
+# Supports high availability with 99.9% uptime target
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels:
+    app: detection-platform
+    component: backend
+  annotations:
+    description: "Backend service deployment for AI-Driven Detection Engineering platform"
+    maintainer: "Platform Team"
+spec:
+  # High availability configuration with 3 replicas
+  replicas: 3
+  # Zero-downtime deployment strategy
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: detection-platform
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: detection-platform
+        component: backend
+      annotations:
+        # Prometheus monitoring configuration
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      # Pod security context for non-root execution
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      
+      # Pod anti-affinity for high availability
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: detection-platform
+                  component: backend
+              topologyKey: kubernetes.io/hostname
+      
+      # Dependency check initialization
+      initContainers:
+      - name: init-deps
+        image: detection-platform/init:v1.0.0
+        command: ["sh", "-c", "check-dependencies.sh"]
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+      
+      # Main application container
+      containers:
+      - name: backend
+        image: detection-platform/backend:v1.0.0
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 8000
+          protocol: TCP
+        
+        # Resource limits as per specifications
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+        
+        # Health check probes
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 8000
+          initialDelaySeconds: 45
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+        
+        startupProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          failureThreshold: 30
+        
+        # Container security context
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop: ["ALL"]
+        
+        # Environment configuration
+        envFrom:
+        - configMapRef:
+            name: backend-config
+        
+        # Volume mounts for temporary data
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+          readOnly: false
+      
+      # Volumes definition
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      
+      # Pod termination grace period
+      terminationGracePeriodSeconds: 60
+      
+      # Service account for backend pods
+      serviceAccountName: backend-service-account
