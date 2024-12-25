@@ -1,0 +1,63 @@
+# Kubernetes Namespace configuration for AI-Driven Detection Engineering platform
+# Defines isolated environments with enhanced security controls and service mesh integration
+# Version: 1.0
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: detection-platform-prod
+  labels:
+    name: detection-platform-prod
+    environment: production
+    istio-injection: enabled
+    security-tier: production
+    backup-policy: enabled
+    monitoring: enabled
+  annotations:
+    scheduler.alpha.kubernetes.io/node-selector: "env=production"
+    net.beta.kubernetes.io/network-policy: "default-deny"
+    backup.velero.io/backup-volumes: "true"
+    linkerd.io/inject: "enabled"
+    # Production environment security and compliance annotations
+    security.compliance/tier: "production"
+    security.monitoring/priority: "high"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: detection-platform-staging
+  labels:
+    name: detection-platform-staging
+    environment: staging
+    istio-injection: enabled
+    security-tier: staging
+    backup-policy: enabled
+    monitoring: enabled
+  annotations:
+    scheduler.alpha.kubernetes.io/node-selector: "env=staging"
+    net.beta.kubernetes.io/network-policy: "default-deny"
+    backup.velero.io/backup-volumes: "true"
+    linkerd.io/inject: "enabled"
+    # Staging environment testing annotations
+    security.testing/enabled: "true"
+    security.monitoring/priority: "medium"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: detection-platform-monitoring
+  labels:
+    name: detection-platform-monitoring
+    environment: monitoring
+    istio-injection: enabled
+    security-tier: monitoring
+    backup-policy: enabled
+    monitoring: enabled
+  annotations:
+    scheduler.alpha.kubernetes.io/node-selector: "env=monitoring"
+    net.beta.kubernetes.io/network-policy: "allow-monitoring"
+    backup.velero.io/backup-volumes: "true"
+    linkerd.io/inject: "enabled"
+    # Monitoring namespace specific annotations
+    monitoring.priority/level: "critical"
+    monitoring.access/restricted: "true"
