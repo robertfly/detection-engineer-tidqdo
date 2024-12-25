@@ -1,0 +1,48 @@
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.pytest_cache
+.mypy_cache
+.ruff_cache
+
+# Test and coverage
+.coverage
+coverage.xml
+htmlcov
+tests
+
+# Development and environment
+.git
+.gitignore
+.env
+.venv
+env
+venv
+scripts
+docker-compose*.yml
+.idea
+.vscode
+
+# Documentation
+README.md
+
+# Logs and temporary files
+*.log
+
+# Security-sensitive files
+*.pem
+*.key
+*.cert
+*.pfx
+*.p12
+
+# Docker-specific
+.dockerignore
+
+# Critical files to include
+!poetry.lock
+!pyproject.toml
+!alembic.ini
+!src
+!migrations
