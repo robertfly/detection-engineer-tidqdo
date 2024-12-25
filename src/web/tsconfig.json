@@ -1,0 +1,70 @@
+{
+  "compilerOptions": {
+    // ECMAScript Target and Features
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ],
+
+    // Module Resolution
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    // Type Checking
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // JavaScript Support
+    "allowJs": false,
+    "skipLibCheck": true,
+
+    // React Configuration
+    "jsx": "react-jsx",
+    "noEmit": true,
+
+    // Development Features
+    "incremental": true,
+    "types": [
+      "vite/client",
+      "jest",
+      "@testing-library/jest-dom"
+    ]
+  },
+
+  // Project Files
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "vite.config.ts",
+    "jest.config.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "build",
+    "coverage"
+  ],
+
+  // Project References
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ]
+}
