@@ -1,0 +1,175 @@
+/**
+ * Theme-specific CSS styles implementing Material Design 3.0
+ * Version: 1.0.0
+ * Supports: Light/Dark themes, System preferences, Accessibility features
+ */
+
+@import '../styles/variables.css';
+
+/* Base Theme Configuration
+-------------------------------------------------- */
+:root {
+  color-scheme: light dark;
+  --high-contrast-text: #000000;
+  --high-contrast-text-secondary: #333333;
+}
+
+/* Global Styles
+-------------------------------------------------- */
+body {
+  background-color: var(--background-default);
+  color: var(--text-primary);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  transition: background-color var(--transition-normal),
+              color var(--transition-normal),
+              border-color var(--transition-normal);
+  contain: content;
+}
+
+/* Light Theme
+-------------------------------------------------- */
+[data-theme='light'],
+.theme-light {
+  --background-default: #FFFFFF;
+  --background-paper: #FFFFFF;
+  --text-primary: #2C3E50;
+  --text-secondary: #7F8C8D;
+  --border-color: #BDC3C7;
+  --hover-overlay: rgba(0, 0, 0, 0.04);
+  --focus-ring: rgba(44, 62, 80, 0.24);
+  --surface-overlay: rgba(255, 255, 255, 0.8);
+  
+  /* Material Design Color Tokens */
+  --primary-surface: var(--primary-light);
+  --primary-text: var(--primary-dark);
+  --secondary-surface: var(--secondary-light);
+  --secondary-text: var(--secondary-dark);
+}
+
+/* Dark Theme
+-------------------------------------------------- */
+[data-theme='dark'],
+.theme-dark {
+  --background-default: #1E1E1E;
+  --background-paper: #1E1E1E;
+  --text-primary: #FFFFFF;
+  --text-secondary: #B2B2B2;
+  --border-color: #404040;
+  --hover-overlay: rgba(255, 255, 255, 0.08);
+  --focus-ring: rgba(255, 255, 255, 0.24);
+  --surface-overlay: rgba(30, 30, 30, 0.8);
+  
+  /* Material Design Color Tokens */
+  --primary-surface: var(--primary-dark);
+  --primary-text: var(--primary-light);
+  --secondary-surface: var(--secondary-dark);
+  --secondary-text: var(--secondary-light);
+}
+
+/* System Theme Preference
+-------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --background-default: #1E1E1E;
+    --background-paper: #1E1E1E;
+    --text-primary: #FFFFFF;
+    --text-secondary: #B2B2B2;
+    --border-color: #404040;
+    --hover-overlay: rgba(255, 255, 255, 0.08);
+    --focus-ring: rgba(255, 255, 255, 0.24);
+    --surface-overlay: rgba(30, 30, 30, 0.8);
+  }
+}
+
+/* Accessibility: Reduced Motion
+-------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Theme Transition Class
+-------------------------------------------------- */
+.theme-transition {
+  transition: background-color var(--transition-normal),
+              color var(--transition-normal),
+              border-color var(--transition-normal);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: background-color, color, border-color;
+}
+
+/* High Contrast Mode
+-------------------------------------------------- */
+.high-contrast {
+  --text-primary: var(--high-contrast-text);
+  --text-secondary: var(--high-contrast-text-secondary);
+  --border-color: var(--high-contrast-text);
+  border-width: 2px;
+}
+
+/* Focus Accessibility
+-------------------------------------------------- */
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Keyboard Navigation Enhancement
+-------------------------------------------------- */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Performance Optimizations
+-------------------------------------------------- */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Color Contrast Utilities
+-------------------------------------------------- */
+.contrast-enhanced {
+  --text-primary: #000000;
+  --text-secondary: #333333;
+  --border-color: #000000;
+}
+
+[data-theme='dark'] .contrast-enhanced {
+  --text-primary: #FFFFFF;
+  --text-secondary: #E0E0E0;
+  --border-color: #FFFFFF;
+}
+
+/* Surface Overlays
+-------------------------------------------------- */
+.surface-overlay {
+  backdrop-filter: blur(8px);
+  background-color: var(--surface-overlay);
+}
+
+/* Print Styles
+-------------------------------------------------- */
+@media print {
+  body {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  
+  .theme-transition,
+  .gpu-accelerated {
+    transition: none !important;
+    transform: none !important;
+  }
+}
