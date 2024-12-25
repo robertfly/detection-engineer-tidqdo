@@ -1,0 +1,50 @@
+# Service manifest for AI-Driven Detection Engineering platform backend API
+# Version: 1.0.0
+# Provides internal cluster networking and load balancing for backend pods
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: backend
+  namespace: detection-platform-prod  # Will be overridden for staging
+  labels:
+    app: detection-platform
+    component: backend
+    tier: backend
+  annotations:
+    service.kubernetes.io/topology-aware-hints: "auto"  # Enable topology-aware routing
+    prometheus.io/scrape: "true"  # Enable Prometheus metrics scraping
+    prometheus.io/port: "8000"
+
+spec:
+  type: ClusterIP  # Internal cluster access only for security
+  
+  # Port configuration for backend API service
+  ports:
+    - name: http  # Named port for better service discovery
+      port: 80    # Service port exposed internally
+      targetPort: 8000  # Maps to container port in backend pods
+      protocol: TCP
+  
+  # Pod selector for service endpoints
+  selector:
+    app: detection-platform
+    component: backend
+  
+  # Session affinity for consistent routing
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800  # 3 hour session stickiness
+  
+  # Publishing not ready addresses disabled for high availability
+  publishNotReadyAddresses: false
+  
+  # Internal traffic policy for better performance
+  internalTrafficPolicy: Cluster
+
+  # IP family policy for dual-stack support
+  ipFamilyPolicy: PreferDualStack
+  ipFamilies:
+    - IPv4
+    - IPv6
