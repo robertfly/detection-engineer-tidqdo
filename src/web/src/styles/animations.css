@@ -1,0 +1,162 @@
+/* animations.css
+ * Core animation and transition styles for the AI Detection Platform
+ * Version: 1.0.0
+ * Dependencies: tailwindcss@3.3+
+ */
+
+/* Base Animation Properties
+ * Following Material Design 3.0 motion specifications
+ * https://m3.material.io/styles/motion/easing-and-duration/applying-easing-and-duration
+ */
+:root {
+  --animation-standard: cubic-bezier(0.2, 0, 0, 1);
+  --animation-emphasized: cubic-bezier(0.2, 0, 0, 1.2);
+  --animation-duration-short: 200ms;
+  --animation-duration-medium: 400ms;
+  --animation-duration-long: 500ms;
+}
+
+/* Loading Spinner Animation
+ * Hardware-accelerated rotating spinner for loading states
+ */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+  transform-origin: center;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Pulse Animation
+ * Optimized pulsing opacity for loading indicators
+ */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  will-change: opacity;
+}
+
+/* Shimmer Animation
+ * Performance-optimized skeleton loading animation
+ */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  animation: shimmer 2s linear infinite;
+  background: linear-gradient(
+    90deg,
+    var(--background-color) 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    var(--background-color) 100%
+  );
+  background-size: 200% 100%;
+  will-change: background-position;
+}
+
+/* Slide In Animation
+ * Used for toast notifications and modals
+ */
+@keyframes slideIn {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.slide-in {
+  animation: slideIn var(--animation-duration-medium) var(--animation-standard);
+  will-change: transform;
+}
+
+/* Fade In Animation
+ * Used for modals and overlay elements
+ */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn var(--animation-duration-medium) var(--animation-standard);
+  will-change: opacity;
+}
+
+/* Scale In Animation
+ * Used for interactive elements and confirmations
+ */
+@keyframes scaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.scale-in {
+  animation: scaleIn var(--animation-duration-short) var(--animation-emphasized);
+  will-change: transform, opacity;
+}
+
+/* Transition Classes
+ * Reusable transition utilities with hardware acceleration
+ */
+.transition-transform {
+  transition-property: transform;
+  transition-timing-function: var(--animation-standard);
+  transition-duration: var(--animation-duration-medium);
+  will-change: transform;
+}
+
+.transition-opacity {
+  transition-property: opacity;
+  transition-timing-function: var(--animation-standard);
+  transition-duration: var(--animation-duration-medium);
+  will-change: opacity;
+}
+
+/* Accessibility - Reduced Motion
+ * Respects user preferences for reduced motion
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .loading-spinner,
+  .pulse,
+  .shimmer,
+  .slide-in,
+  .fade-in,
+  .scale-in {
+    animation: none !important;
+  }
+}
+
+/* Animation Modifiers
+ * Optional animation timing modifiers
+ */
+.animation-delay-100 { animation-delay: 100ms; }
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-300 { animation-delay: 300ms; }
+
+.animation-duration-short { animation-duration: var(--animation-duration-short); }
+.animation-duration-medium { animation-duration: var(--animation-duration-medium); }
+.animation-duration-long { animation-duration: var(--animation-duration-long); }
