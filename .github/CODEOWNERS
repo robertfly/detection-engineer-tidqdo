@@ -1,0 +1,29 @@
+# Unless a later match takes precedence, these owners will be requested for review on all PRs.
+* @detection-platform/maintainers @detection-platform/security-team
+
+# Backend service code requires both backend team and security team review
+src/backend/** @detection-platform/backend-team @detection-platform/security-team
+
+# Frontend code requires both frontend team and security team review
+src/web/** @detection-platform/frontend-team @detection-platform/security-team
+
+# Infrastructure code requires both DevOps and security team review
+infrastructure/** @detection-platform/devops-team @detection-platform/security-team
+
+# CI/CD workflows require both DevOps and security team review
+.github/workflows/** @detection-platform/devops-team @detection-platform/security-team
+
+# Documentation ownership
+*.md @detection-platform/docs-team
+
+# Security documentation requires security team review
+SECURITY.md @detection-platform/security-team
+
+# Security configurations and policies
+security/** @detection-platform/security-team
+
+# Test files require both QA and security team review
+**/test/** @detection-platform/qa-team @detection-platform/security-team
+
+# Authentication and authorization related code requires security team review
+**/*auth*/** @detection-platform/security-team
